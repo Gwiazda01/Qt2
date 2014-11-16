@@ -31,7 +31,6 @@ private:
     std::vector <int> snake_pos_x;
     std::vector <int> snake_pos_y;
     bool fruit_exist;
-    //bool game;
     bool start;
     bool pause;
     int score;
@@ -41,8 +40,16 @@ private:
         started,
         game_over
     };
+    enum glevel
+    {
+        easy,
+        medium,
+        hard
+    };
 
+    unsigned short int game_level;
     gstate game_state;
+    glevel gm_level;
 
 
 
@@ -50,12 +57,14 @@ protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *key);
     QTimer *timer;
-    QPoint *point,*point2,*point3,*fruit,*point5;
+    QPoint *point,*point2,*point3,*fruit,*point5,*a,*b,*c,*d;
+    QLine *line,*line2;
 
     std::vector <QPoint*> snake;
     void setPossition();
     void addFruit();
     void gameOver();
+    void levelUp();
 
 public slots:
     void TimerSlot();
