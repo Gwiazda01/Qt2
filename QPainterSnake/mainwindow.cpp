@@ -277,40 +277,41 @@ void MainWindow::addFruit()
     int x,y;
     x=rand()%198+16;
     y=rand()%198+16;
-
-    for(unsigned i=0; i<snake.size(); ++i)
-    {
-
+    while( y%8 ) y=rand()%198+16;
+    while( x%8 ) x=rand()%198+16;
 
         switch(game_level)
         {
             case 1:
-                while((y%8) || y==snake[i]->y() ) y=rand()%198+16;
-                while((x%8) || x==snake[i]->x() ) x=rand()%198+16;
+                while(isSnakeBody(x,y))
+                {
+                    while( y%8 ) y=rand()%198+16;
+                    while( x%8 ) x=rand()%198+16;
+                }
                 break;
             case 2:
-                while((x==32 && y==32) || (x==192 && y==192) || (x%8) || x==snake[i]->x() || (y%8) || y==snake[i]->y() )
+                while((x==32 && y==32) || (x==192 && y==192) || (x%8) || (y%8) || isSnakeBody(x,y) )
                 {
                     y=rand()%198+16;
                     x=rand()%198+16;
                 }
                 break;
             case 3:
-                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || (x%8) || x==snake[i]->x() || (y%8) || y==snake[i]->y())
+                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || (x%8) || (y%8) || isSnakeBody(x,y))
                 {
                     y=rand()%198+16;
                     x=rand()%198+16;
                 }
                 break;
             case 4:
-                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || ((x>=32 && x<=88) && y==104) || (x%8) || x==snake[i]->x() || (y%8) || y==snake[i]->y())
+                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || ((x>=32 && x<=88) && y==104) || (x%8) || (y%8) || isSnakeBody(x,y))
                 {
                     y=rand()%198+16;
                     x=rand()%198+16;
                 }
                 break;
             case 5:
-                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || ((x>=32 && x<=88) && y==104) || ((x>=134 && x<=192) && y==104) || (x%8) || x==snake[i]->x() || (y%8) || y==snake[i]->y() )
+                while((x==32 && y==32) || (x==192 && y==192) || (x==32 && y==192) || (x==192 && y==32) || ((x>=32 && x<=88) && y==104) || ((x>=134 && x<=192) && y==104) || (x%8) || (y%8) || isSnakeBody(x,y) )
                 {
                     y=rand()%198+16;
                     x=rand()%198+16;
@@ -318,8 +319,6 @@ void MainWindow::addFruit()
                 break;
 
         }
-
-    }
     fruit = new QPoint(x,y);
 }
 //******************************************************
@@ -372,4 +371,14 @@ void MainWindow::levelUp()
             break;
 
     }
+}
+//************************************************************
+bool MainWindow::isSnakeBody(int x, int y)
+{
+    for(unsigned i=0; i<snake.size(); ++i)
+    {
+        if(snake[i]->x() == x && snake[i]->y() == y)
+            return true;
+    }
+    return false;
 }

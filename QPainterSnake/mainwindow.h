@@ -65,6 +65,7 @@ protected:
     void addFruit();
     void gameOver();
     void levelUp();
+    bool isSnakeBody(int, int);
 
 public slots:
     void TimerSlot();
