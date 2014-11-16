@@ -166,8 +166,11 @@ void MainWindow::addFruit()
     int x,y;
     x=rand()%198;
     y=rand()%198;
-    while((x%8)) x=rand()%198;
-    while((y%8)) y=rand()%198;
+    for(unsigned i=0; i<snake.size(); ++i)
+    {
+        while((x%8) || x==snake[i]->x() ) x=rand()%198;
+        while((y%8) || y==snake[i]->y() ) y=rand()%198;
+    }
     if(x==0||x==8)
     {
         x=16;
