@@ -36,9 +36,20 @@ void MainWindow::paintEvent(QPaintEvent *)
 
     painter.setPen(Qt::black);
     painter.drawRect(8,8,205,205);
+    if(pause)
+    {
+        painter.drawText(rect(), Qt::AlignBottom,"PRESS SPACE TO START");
+        update();
+    }
+    else
+    {
+        painter.drawText(rect(), Qt::AlignBottom,"PRESS SPACE TO PAUSE");
+        update();
+    }
     QPen pen(Qt::blue);
     pen.setWidth(8);
     painter.setPen(pen);
+
 
         for(unsigned i = 0; i<snake.size(); ++i)
             painter.drawPoint(*snake[i]);
