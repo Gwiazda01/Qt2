@@ -132,7 +132,15 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
             if(snake[1]->y()!= snake[0]->y()-8)
                 direction=forward;
             break;
+        case Qt::Key_Up:
+            if(snake[1]->y()!= snake[0]->y()-8)
+                direction=forward;
+        break;
         case Qt::Key_S:
+            if(snake[1]->y()!= snake[0]->y()+8)
+                direction=backward;
+            break;
+        case Qt::Key_Down:
             if(snake[1]->y()!= snake[0]->y()+8)
                 direction=backward;
             break;
@@ -140,7 +148,15 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
             if(snake[1]->x()!= snake[0]->x()+8)
                 direction=left;
             break;
+        case Qt::Key_Left:
+            if(snake[1]->x()!= snake[0]->x()+8)
+                direction=left;
+            break;
         case Qt::Key_D:
+            if(snake[1]->x()!= snake[0]->x()+8)
+                direction=right;
+            break;
+        case Qt::Key_Right:
             if(snake[1]->x()!= snake[0]->x()+8)
                 direction=right;
             break;
