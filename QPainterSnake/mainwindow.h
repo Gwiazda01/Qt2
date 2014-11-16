@@ -33,6 +33,7 @@ private:
     bool fruit_exist;
     bool game;
     bool start;
+    bool pause;
     int score;
 
 
@@ -46,7 +47,6 @@ protected:
     void setPossition();
     void addFruit();
     void gameOver();
-    void addSnakeBody();
 
 public slots:
     void TimerSlot();

@@ -71,6 +71,8 @@ void MainWindow::paintEvent(QPaintEvent *)
 //********************************************************
 void MainWindow::TimerSlot()
 {
+if(!pause)
+{
     for(unsigned i=0; i<snake.size(); ++i)
     {
         snake_pos_x.push_back(snake[i]->x());
@@ -109,6 +111,7 @@ void MainWindow::TimerSlot()
 
 
     }
+}
 //*********************************************************
 void MainWindow::keyPressEvent(QKeyEvent *key)
 {
@@ -129,6 +132,9 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
         case Qt::Key_D:
             if(snake[1]->x()!= snake[0]->x()+8)
                 direction=right;
+            break;
+        case Qt::Key_Space:
+            pause= !pause;
             break;
 
     }
