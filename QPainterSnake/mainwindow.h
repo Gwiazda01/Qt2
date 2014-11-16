@@ -34,7 +34,6 @@ private:
     bool game;
     bool start;
     int score;
-    QString result;
 
 
 protected:
