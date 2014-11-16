@@ -31,10 +31,19 @@ private:
     std::vector <int> snake_pos_x;
     std::vector <int> snake_pos_y;
     bool fruit_exist;
-    bool game;
+    //bool game;
     bool start;
     bool pause;
     int score;
+    enum gstate
+    {
+        not_started,
+        started,
+        game_over
+    };
+
+    gstate game_state;
+
 
 
 protected:

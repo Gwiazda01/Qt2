@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     direction = backward;
-    timer = new QTimer(this);
+    //timer = new QTimer(this);
     point = new QPoint(16,16);
     point2 = new QPoint(16,24);
     point3 = new QPoint(16,32);
@@ -15,11 +15,10 @@ MainWindow::MainWindow(QWidget *parent) :
     snake.push_back(point2);
     snake.push_back(point3);
     addFruit();
-    game=true;
+    game_state=not_started;
     start=false;
-    score=0;
-    connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
-    timer->start(200);
+    pause=false;
+
     srand(time(NULL));
 }
 
@@ -30,8 +29,19 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
+    if(game_state==not_started)
+    {
 
-    if(game)
+        painter.setFont(QFont("Times", 35));
+        painter.drawText(rect(),Qt::AlignTop,"\t\t\t\t\t\t\t\t\tSNAKE");
+        painter.setFont(QFont("Times",30));
+        painter.drawText(rect(),Qt::AlignTop,"\n\t\t\t\t\t\t\tChoose level:");
+        painter.setPen(Qt::blue);
+        painter.setFont(QFont("Times", 30));
+        painter.drawText(rect(),Qt::AlignCenter,"\n\nEasy - 1\nMedium - 2\nHard - 3 ");
+    }
+
+    if(game_state==started)
     {
 
     painter.setPen(Qt::black);
@@ -61,7 +71,7 @@ void MainWindow::paintEvent(QPaintEvent *)
             painter.drawPoint(*fruit);
         }
      }
-     else
+     else if(game_state==game_over)
     {
 
         //delete point;
@@ -82,6 +92,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 //********************************************************
 void MainWindow::TimerSlot()
 {
+
 if(!pause)
 {
     for(unsigned i=0; i<snake.size(); ++i)
@@ -117,8 +128,8 @@ if(!pause)
     snake_pos_x.clear();
     snake_pos_y.clear();
     update();
-    if(start)gameOver();
-    start=true;
+    if(start&&game_state==started)gameOver();
+    if(game_state==started)start=true;
 
 
     }
@@ -163,7 +174,33 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
         case Qt::Key_Space:
             pause= !pause;
             break;
-
+        case Qt::Key_1:
+            if(game_state==not_started)
+            {
+                timer = new QTimer(this);
+                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+                timer->start(300);
+                game_state = started;
+            }
+            break;
+        case Qt::Key_2:
+            if(game_state==not_started)
+            {
+                timer = new QTimer(this);
+                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+                timer->start(200);
+                game_state = started;
+            }
+            break;
+        case Qt::Key_3:
+            if(game_state==not_started)
+            {
+                timer = new QTimer(this);
+                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+                timer->start(100);
+                game_state = started;
+            }
+            break;
     }
 }
 //****************************************************
@@ -203,7 +240,7 @@ void MainWindow::gameOver()
     for(unsigned i=1; i<snake.size(); ++i)
     {
         if((snake[0]->x()== snake[i]->x() && snake[0]->y() == snake[i]->y()) || (snake[0]->x()<10 || snake[0]->x()>215 ||snake[0]->y()<10 || snake[0]->y()>215 ))
-            game=false;
+            game_state=game_over;
     }
 }
 //******************************************************
