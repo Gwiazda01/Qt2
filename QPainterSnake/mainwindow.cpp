@@ -7,7 +7,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     direction = backward;
-    //timer = new QTimer(this);
     point = new QPoint(16,16);
     point2 = new QPoint(16,24);
     point3 = new QPoint(16,32);
@@ -18,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     game_state=not_started;
     start=false;
     pause=false;
+    score=0;
 
     srand(time(NULL));
 }
@@ -128,8 +128,8 @@ if(!pause)
     snake_pos_x.clear();
     snake_pos_y.clear();
     update();
-    if(start&&game_state==started)gameOver();
-    if(game_state==started)start=true;
+    if(start)gameOver();
+    start=true;
 
 
     }
