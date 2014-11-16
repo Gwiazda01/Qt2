@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     direction = backward;
     timer = new QTimer(this);
-    point = new QPoint(14,14);
-    point2 = new QPoint(14,22);
-    point3 = new QPoint(14,30);
+    point = new QPoint(16,16);
+    point2 = new QPoint(16,24);
+    point3 = new QPoint(16,32);
     snake.push_back(point);
     snake.push_back(point2);
     snake.push_back(point3);
@@ -35,7 +35,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     {
 
     painter.setPen(Qt::black);
-    painter.drawRect(10,10,205,205);
+    painter.drawRect(8,8,205,205);
     QPen pen(Qt::blue);
     pen.setWidth(8);
     painter.setPen(pen);
@@ -52,6 +52,12 @@ void MainWindow::paintEvent(QPaintEvent *)
      }
      else
     {
+
+        //delete point;
+        //delete point2;
+        //delete point3;
+        QString result;
+        delete fruit;
         painter.setPen(Qt::black);
         painter.setFont(QFont("Times", 45));
         painter.drawText(rect(),Qt::AlignCenter, "GAME OVER!!");
@@ -74,24 +80,20 @@ void MainWindow::TimerSlot()
     switch(direction)
     {
         case forward:
-            snake[0]->setY(snake[0]->y()-8);
-
+                snake[0]->setY(snake[0]->y()-8);
             break;
         case backward:
-            snake[0]->setY(snake[0]->y()+8);
-
+                snake[0]->setY(snake[0]->y()+8);
             break;
         case left:
-            snake[0]->setX(snake[0]->x()-8);
-
+                snake[0]->setX(snake[0]->x()-8);
             break;
         case right:
-            snake[0]->setX(snake[0]->x()+8);
-
+                snake[0]->setX(snake[0]->x()+8);
             break;
     }
     if(fruit_exist)
-        if((snake[0]->x()<=fruit->x()+4 && snake[0]->x()>=fruit->x()-4)&&(snake[0]->y()<=fruit->y()+4 && snake[0]->y()>=fruit->y()-4))
+        if((snake[0]->x()==fruit->x()) &&(snake[0]->y()==fruit->y()))
         {
             fruit_exist=false;
             snake.insert(snake.begin(),fruit);
@@ -113,19 +115,19 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
     switch(key->key())
     {
         case Qt::Key_W:
-            if(direction!=backward)
+            if(snake[1]->y()!= snake[0]->y()-8)
                 direction=forward;
             break;
         case Qt::Key_S:
-            if(direction!=forward)
+            if(snake[1]->y()!= snake[0]->y()+8)
                 direction=backward;
             break;
         case Qt::Key_A:
-            if(direction!=right)
+            if(snake[1]->x()!= snake[0]->x()+8)
                 direction=left;
             break;
         case Qt::Key_D:
-            if(direction!=left)
+            if(snake[1]->x()!= snake[0]->x()+8)
                 direction=right;
             break;
 
@@ -145,13 +147,21 @@ void MainWindow::addFruit()
 {
     fruit_exist=true;
     int x,y;
-    x=rand()%201;
-    y=rand()%201;
-    while(!(x%8)) x=rand()%201;
-    while(!(x%8)) y=rand()%201;
-    fruit = new QPoint(x+12,y+12);
+    x=rand()%198;
+    y=rand()%198;
+    while((x%8)) x=rand()%198;
+    while((y%8)) y=rand()%198;
+    if(x==0||x==8)
+    {
+        x=16;
+    }
+    if(y==0||y==8)
+    {
+        y=16;
+    }
+    fruit = new QPoint(x,y);
 }
-//*****************************************************
+//******************************************************
 void MainWindow::gameOver()
 {
     for(unsigned i=1; i<snake.size(); ++i)
