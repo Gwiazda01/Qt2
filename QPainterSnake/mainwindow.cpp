@@ -7,19 +7,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     direction = backward;
-    point = new QPoint(16,16);
-    point2 = new QPoint(16,24);
-    point3 = new QPoint(16,32);
+    point = new QPoint(120,64);
+    point2 = new QPoint(120,56);
+    point3 = new QPoint(120,48);
     snake.push_back(point);
     snake.push_back(point2);
     snake.push_back(point3);
     game_state=not_started;
     game_level=1;
+    counter=0;
     addFruit();
-    start=false;
     pause=false;
     score=0;
-
     srand(time(NULL));
 }
 
@@ -30,26 +29,25 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    if(game_state==not_started)
-    {
+if(game_state==not_started)
+{
+    painter.setFont(QFont("Times", 35));
+    painter.drawText(rect(),Qt::AlignTop,"\t\t\t\t\t\t\t\t\tSNAKE");
+    painter.setFont(QFont("Times",30));
+    painter.drawText(rect(),Qt::AlignTop,"\n\t\t\t\t\t\t\tChoose level:");
+    painter.setPen(Qt::blue);
+    painter.setFont(QFont("Times", 30));
+    painter.drawText(rect(),Qt::AlignCenter,"\n\nEasy - 1\nMedium - 2\nHard - 3 ");
+}
 
-        painter.setFont(QFont("Times", 35));
-        painter.drawText(rect(),Qt::AlignTop,"\t\t\t\t\t\t\t\t\tSNAKE");
-        painter.setFont(QFont("Times",30));
-        painter.drawText(rect(),Qt::AlignTop,"\n\t\t\t\t\t\t\tChoose level:");
-        painter.setPen(Qt::blue);
-        painter.setFont(QFont("Times", 30));
-        painter.drawText(rect(),Qt::AlignCenter,"\n\nEasy - 1\nMedium - 2\nHard - 3 ");
-    }
-
-    if(game_state==started)
-    {
-
+if(game_state==started)
+{
     painter.setPen(Qt::black);
     painter.drawRect(8,8,208,208);
     QPen apen;
     apen.setColor(Qt::black);
     apen.setWidth(8);
+
     switch(game_level)
     {
         case 2:
@@ -112,10 +110,10 @@ void MainWindow::paintEvent(QPaintEvent *)
             pen.setWidth(8);
             painter.setPen(pen);
             painter.drawPoint(*fruit);
-        }
-     }
-     else if(game_state==game_over)
-    {
+        }    
+}
+else if(game_state==game_over)
+{
 
         //delete point;
         //delete point2;
@@ -128,7 +126,14 @@ void MainWindow::paintEvent(QPaintEvent *)
         painter.setFont(QFont("Times", 25));
         result = "Score: "+QString::number(score);
         painter.drawText(rect(), Qt::AlignBottom,result);
-    }
+}
+else if(game_state==lvl_up)
+{
+    painter.setPen(Qt::black);
+    painter.setFont(QFont("Times", 40));
+    painter.drawText(rect(),Qt::AlignCenter,"Level UP !!");
+    update();
+}
 
 }
 
@@ -136,7 +141,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 void MainWindow::TimerSlot()
 {
 
-if(!pause)
+if((!pause) && (game_state!=lvl_up))
 {
     for(unsigned i=0; i<snake.size(); ++i)
     {
@@ -179,19 +184,55 @@ if(!pause)
             levelUp();
             addFruit();
         }
-    setPossition();
+
+    if(game_state!=lvl_up)setPossition();
     snake_pos_x.clear();
     snake_pos_y.clear();
     update();
-    if(start)gameOver();
-    start=true;
+    gameOver();
 
+
+
+    }
+else
+    {
+        if(game_state==lvl_up)
+        {
+            ++counter;
+            switch(gm_level)
+            {
+                case easy:
+                    if(counter==3)
+                    {
+                        game_state=started;
+                        counter=0;
+                    }
+                 break;
+
+                case medium:
+                    if(counter==5)
+                    {
+                        game_state=started;
+                        counter=0;
+                    }
+                break;
+                case hard:
+                    if(counter==10)
+                    {
+                        game_state=started;
+                        counter=0;
+                    }
+                break;
+
+            }
+        }
 
     }
 }
 //*********************************************************
 void MainWindow::keyPressEvent(QKeyEvent *key)
 {
+if(game_state!=lvl_up)
     switch(key->key())
     {
         case Qt::Key_W:
@@ -211,11 +252,11 @@ void MainWindow::keyPressEvent(QKeyEvent *key)
                 direction=backward;
             break;
         case Qt::Key_A:
-            if(snake[1]->x()!= snake[0]->x()+8)
+            if(snake[1]->x()!= snake[0]->x()-8)
                 direction=left;
             break;
         case Qt::Key_Left:
-            if(snake[1]->x()!= snake[0]->x()+8)
+            if(snake[1]->x()!= snake[0]->x()-8)
                 direction=left;
             break;
         case Qt::Key_D:
@@ -359,15 +400,24 @@ void MainWindow::levelUp()
     {
         case easy:
             if(!(score%50) && game_level<5)
+            {
                 ++game_level;
+                setSnakeStartPos();
+            }
             break;
         case medium:
             if(!(score%100) && game_level<5)
+            {
                 ++game_level;
+                setSnakeStartPos();
+            }
             break;
         case hard:
             if(!(score%150) && game_level<5)
+            {
                 ++game_level;
+                setSnakeStartPos();
+            }
             break;
 
     }
@@ -382,3 +432,28 @@ bool MainWindow::isSnakeBody(int x, int y)
     }
     return false;
 }
+//************************************************************
+void MainWindow::setSnakeStartPos()
+{
+        game_state=lvl_up;
+        snake.clear();
+
+
+    point->setX(120);
+    point->setY(64);
+
+    point2->setX(120);
+    point2->setY(56);
+
+    point3->setX(120);
+    point3->setY(48);
+
+    snake.push_back(point);
+    snake.push_back(point2);
+    snake.push_back(point3);
+
+    direction = backward;
+
+}
+//*************************************************************
+

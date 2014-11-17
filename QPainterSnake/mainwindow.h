@@ -31,14 +31,15 @@ private:
     std::vector <int> snake_pos_x;
     std::vector <int> snake_pos_y;
     bool fruit_exist;
-    bool start;
     bool pause;
     int score;
+    int counter;
     enum gstate
     {
         not_started,
         started,
-        game_over
+        game_over,
+        lvl_up
     };
     enum glevel
     {
@@ -65,7 +66,9 @@ protected:
     void addFruit();
     void gameOver();
     void levelUp();
+    void setSnakeStartPos();
     bool isSnakeBody(int, int);
+
 
 public slots:
     void TimerSlot();
