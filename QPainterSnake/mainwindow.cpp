@@ -399,25 +399,103 @@ void MainWindow::levelUp()
     switch(gm_level)
     {
         case easy:
-            if(!(score%50) && game_level<5)
+            switch(game_level)
             {
-                ++game_level;
-                setSnakeStartPos();
+                case 1:
+                if(!(score%100))
+                {
+                    ++game_level;
+                    setSnakeStartPos();
+                }
+                break;
+                case 2:
+                if(!(score%120))
+                {
+                    ++game_level;
+                    setSnakeStartPos();
+                }
+                break;
+                case 3:
+                if(!(score%150))
+                {
+                    ++game_level;
+                    setSnakeStartPos();
+                }
+                break;
+                case 4:
+                if(!(score%200))
+                {
+                    ++game_level;
+                    setSnakeStartPos();
+                }
+                break;
             }
             break;
         case medium:
-            if(!(score%100) && game_level<5)
+        switch(game_level)
+        {
+            case 1:
+            if(!(score%200))
             {
                 ++game_level;
                 setSnakeStartPos();
             }
             break;
-        case hard:
-            if(!(score%150) && game_level<5)
+            case 2:
+            if(!(score%240))
             {
                 ++game_level;
                 setSnakeStartPos();
             }
+            break;
+            case 3:
+            if(!(score%300))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+            case 4:
+            if(!(score%400))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+        }
+            break;
+        case hard:
+        switch(game_level)
+        {
+            case 1:
+            if(!(score%300))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+            case 2:
+            if(!(score%360))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+            case 3:
+            if(!(score%450))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+            case 4:
+            if(!(score%600))
+            {
+                ++game_level;
+                setSnakeStartPos();
+            }
+            break;
+        }
             break;
 
     }
