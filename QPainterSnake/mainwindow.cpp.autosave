@@ -435,7 +435,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=6;
                     setSnakeStartPos();
                 }
                 break;
@@ -443,7 +443,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=7;
                     setSnakeStartPos();
                 }
                 break;
@@ -451,7 +451,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=8;
                     setSnakeStartPos();
                 }
                 break;
