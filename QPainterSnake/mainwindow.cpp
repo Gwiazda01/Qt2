@@ -124,11 +124,27 @@ if(game_state==started)
 else if(game_state==game_over)
 {
 
-        //delete point;
-        //delete point2;
-        //delete point3;
-        QString result;
+        snake.clear();
+        timer->stop();
+        delete timer;
+        delete point;
+        delete point2;
+        delete point3;
+        if(game_level>1)
+        {   delete a;
+            delete d;
+        }
+        if(game_level>2)
+        {
+            delete b;
+            delete c;
+        }
+        if(game_level>3)
+            delete line;
+        if(game_level==5)
+            delete line2;
         delete fruit;
+        QString result;
         painter.setPen(Qt::black);
         painter.setFont(QFont("Times", 45));
         painter.drawText(rect(),Qt::AlignCenter, "GAME OVER!!");
@@ -176,7 +192,7 @@ if((!pause) && (game_state!=lvl_up))
     if(fruit_exist)
         if((snake[0]->x()==fruit->x()) &&(snake[0]->y()==fruit->y()))
         {
-            --fruits_to_level_up;
+            if(game_level!=5)--fruits_to_level_up;
             fruit_exist=false;
             snake.insert(snake.begin(),fruit);
             switch(gm_level)
@@ -416,7 +432,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=12;
+                    fruits_to_level_up=1;
                     setSnakeStartPos();
                 }
                 break;
@@ -424,7 +440,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=15;
+                    fruits_to_level_up=1;
                     setSnakeStartPos();
                 }
                 break;
@@ -432,7 +448,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=20;
+                    fruits_to_level_up=1;
                     setSnakeStartPos();
                 }
                 break;

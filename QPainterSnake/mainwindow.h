@@ -60,7 +60,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *key);
     QTimer *timer;
-    QPoint *point,*point2,*point3,*fruit,*point5,*a,*b,*c,*d;
+    QPoint *point,*point2,*point3,*fruit,*a,*b,*c,*d;
     QLine *line,*line2;
 
     std::vector <QPoint*> snake;
