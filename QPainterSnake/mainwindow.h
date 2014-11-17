@@ -34,6 +34,8 @@ private:
     bool pause;
     int score;
     int counter;
+    int points_for_fruit;
+    int fruits_to_level_up;
     enum gstate
     {
         not_started,

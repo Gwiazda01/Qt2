@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     game_state=not_started;
     game_level=1;
     counter=0;
+    fruits_to_level_up=5;
     addFruit();
     pause=false;
     score=0;
@@ -47,6 +48,12 @@ if(game_state==started)
     QPen apen;
     apen.setColor(Qt::black);
     apen.setWidth(8);
+    painter.setFont(QFont("Times", 15));
+    painter.drawText(rect(),Qt::AlignTop, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tLevel:\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+QString::number(game_level));
+    painter.setFont(QFont("Times", 15));
+    painter.drawText(rect(),Qt::AlignCenter, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFruits to next level:\n");
+    painter.setFont(QFont("Times", 12));
+    painter.drawText(rect(),Qt::AlignCenter, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+QString::number(fruits_to_level_up));
 
     switch(game_level)
     {
@@ -89,11 +96,13 @@ if(game_state==started)
     }
     if(pause)
     {
+        painter.setFont(QFont("Times", 10));
         painter.drawText(rect(), Qt::AlignBottom,"PRESS SPACE TO START");
         update();
     }
     else
     {
+        painter.setFont(QFont("Times", 10));
         painter.drawText(rect(), Qt::AlignBottom,"PRESS SPACE TO PAUSE");
         update();
     }
@@ -167,18 +176,19 @@ if((!pause) && (game_state!=lvl_up))
     if(fruit_exist)
         if((snake[0]->x()==fruit->x()) &&(snake[0]->y()==fruit->y()))
         {
+            --fruits_to_level_up;
             fruit_exist=false;
             snake.insert(snake.begin(),fruit);
             switch(gm_level)
             {
                 case easy:
-                    score+=10;
+                    score+=points_for_fruit;
                     break;
                 case medium:
-                    score+=20;
+                    score+=points_for_fruit;
                     break;
                 case hard:
-                    score+=30;
+                    score+=points_for_fruit;
                     break;
             }
             levelUp();
@@ -278,6 +288,7 @@ if(game_state!=lvl_up)
                 timer->start(300);
                 game_state = started;
                 gm_level = easy;
+                points_for_fruit=10;
             }
             break;
         case Qt::Key_2:
@@ -288,6 +299,7 @@ if(game_state!=lvl_up)
                 timer->start(200);
                 game_state = started;
                 gm_level = medium;
+                points_for_fruit=20;
             }
             break;
         case Qt::Key_3:
@@ -298,6 +310,7 @@ if(game_state!=lvl_up)
                 timer->start(100);
                 game_state = started;
                 gm_level = hard;
+                points_for_fruit=30;
             }
             break;
     }
@@ -396,109 +409,41 @@ void MainWindow::gameOver()
 //******************************************************
 void MainWindow::levelUp()
 {
-    switch(gm_level)
-    {
-        case easy:
+
             switch(game_level)
             {
                 case 1:
-                if(!(score%100))
+                if(!(fruits_to_level_up))
                 {
                     ++game_level;
+                    fruits_to_level_up=12;
                     setSnakeStartPos();
                 }
                 break;
                 case 2:
-                if(!(score%120))
+                if(!(fruits_to_level_up))
                 {
                     ++game_level;
+                    fruits_to_level_up=15;
                     setSnakeStartPos();
                 }
                 break;
                 case 3:
-                if(!(score%150))
+                if(!(fruits_to_level_up))
                 {
                     ++game_level;
+                    fruits_to_level_up=20;
                     setSnakeStartPos();
                 }
                 break;
                 case 4:
-                if(!(score%200))
+                if(!(fruits_to_level_up))
                 {
                     ++game_level;
                     setSnakeStartPos();
                 }
                 break;
-            }
-            break;
-        case medium:
-        switch(game_level)
-        {
-            case 1:
-            if(!(score%200))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 2:
-            if(!(score%240))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 3:
-            if(!(score%300))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 4:
-            if(!(score%400))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-        }
-            break;
-        case hard:
-        switch(game_level)
-        {
-            case 1:
-            if(!(score%300))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 2:
-            if(!(score%360))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 3:
-            if(!(score%450))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-            case 4:
-            if(!(score%600))
-            {
-                ++game_level;
-                setSnakeStartPos();
-            }
-            break;
-        }
-            break;
-
-    }
+          }
 }
 //************************************************************
 bool MainWindow::isSnakeBody(int x, int y)
