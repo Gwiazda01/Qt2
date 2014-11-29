@@ -17,9 +17,16 @@ MainWindow::MainWindow(QWidget *parent) :
     game_level=1;
     counter=0;
     fruits_to_level_up=5;
+    fruit = new QPoint();
     addFruit();
     pause=false;
     score=0;
+    a=new QPoint(32,32);
+    d=new QPoint(192,192);
+    b=new QPoint(32,192);
+    c=new QPoint(192,32);
+    line = new QLine(32,104,88,104);
+    line2 = new QLine(134,104,192,104);
     srand(time(NULL));
 }
 
@@ -61,15 +68,15 @@ if(game_state==started)
     switch(game_level)
     {
         case 2:
-            a=new QPoint(32,32);
-            d=new QPoint(192,192);
+            //a=new QPoint(32,32);
+            //d=new QPoint(192,192);
             painter.setPen(apen);
             painter.drawPoint(*a);
             painter.drawPoint(*d);
             break;
         case 3:
-            b=new QPoint(32,192);
-            c=new QPoint(192,32);
+            //b=new QPoint(32,192);
+            //c=new QPoint(192,32);
             painter.setPen(apen);
             painter.drawPoint(*a);
             painter.drawPoint(*b);
@@ -77,7 +84,7 @@ if(game_state==started)
             painter.drawPoint(*d);
             break;
         case 4:
-            line = new QLine(32,104,88,104);
+            //line = new QLine(32,104,88,104);
             painter.setPen(apen);
             painter.drawPoint(*a);
             painter.drawPoint(*b);
@@ -86,7 +93,7 @@ if(game_state==started)
             painter.drawLine(*line);
         break;
         case 5:
-           line2 = new QLine(134,104,192,104);
+           //line2 = new QLine(134,104,192,104);
            painter.setPen(apen);
            painter.drawPoint(*a);
            painter.drawPoint(*b);
@@ -127,26 +134,25 @@ if(game_state==started)
 else if(game_state==game_over)
 {
 
+        for(unsigned i=0; i<snake.size()-3; i++)
+        {
+            delete snake[i];
+            snake[i]= 0;
+        }
         snake.clear();
         timer->stop();
         delete timer;
         delete point;
         delete point2;
         delete point3;
-        if(game_level>1)
-        {   delete a;
-            delete d;
-        }
-        if(game_level>2)
-        {
-            delete b;
-            delete c;
-        }
-        if(game_level>3)
-            delete line;
-        if(game_level==5)
-            delete line2;
+        delete a;
+        delete d;
+        delete b;
+        delete c;
+        delete line;
+        delete line2;
         delete fruit;
+
         QString result;
         painter.setPen(Qt::black);
         painter.setFont(QFont("Times", 45));
@@ -197,7 +203,8 @@ if((!pause) && (game_state!=lvl_up))
         {
             if(game_level!=5)--fruits_to_level_up;
             fruit_exist=false;
-            snake.insert(snake.begin(),fruit);
+            snake.insert(snake.begin(),new QPoint(fruit->x(),fruit->y()));
+
             switch(gm_level)
             {
                 case easy:
@@ -261,7 +268,7 @@ else
 //*********************************************************
 void MainWindow::keyPressEvent(QKeyEvent *key)
 {
-if(game_state!=lvl_up)
+if(game_state!=lvl_up && game_state!= game_over)
     switch(key->key())
     {
         case Qt::Key_W:
@@ -392,7 +399,8 @@ void MainWindow::addFruit()
                 break;
 
         }
-    fruit = new QPoint(x,y);
+    fruit -> setX(x);
+    fruit -> setY(y);
 }
 //******************************************************
 void MainWindow::gameOver()
@@ -435,7 +443,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=6;
                     setSnakeStartPos();
                 }
                 break;
@@ -443,7 +451,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=7;
                     setSnakeStartPos();
                 }
                 break;
@@ -451,7 +459,7 @@ void MainWindow::levelUp()
                 if(!(fruits_to_level_up))
                 {
                     ++game_level;
-                    fruits_to_level_up=1;
+                    fruits_to_level_up=8;
                     setSnakeStartPos();
                 }
                 break;
@@ -477,9 +485,14 @@ bool MainWindow::isSnakeBody(int x, int y)
 //************************************************************
 void MainWindow::setSnakeStartPos()
 {
-        game_state=lvl_up;
-        snake.clear();
+    game_state=lvl_up;
+for(unsigned i=0; i<snake.size()-3; i++)
+{
+    delete snake[i];
+    snake[i]= 0;
+}
 
+    snake.clear();
 
     point->setX(120);
     point->setY(64);
