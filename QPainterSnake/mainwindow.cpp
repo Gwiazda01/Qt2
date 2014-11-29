@@ -1,33 +1,61 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    direction = backward;
-    point = new QPoint(120,64);
-    point2 = new QPoint(120,56);
-    point3 = new QPoint(120,48);
-    snake.push_back(point);
-    snake.push_back(point2);
-    snake.push_back(point3);
+
     game_state=not_started;
-    game_level=1;
     counter=0;
+    e_button = new QPushButton("EASY", this);
+    e_button->setGeometry(QRect(QPoint(100, 100),
+                                    QSize(200, 50)));
+    connect(e_button, SIGNAL(released()), this, SLOT(easyButton()));
+
+    m_button = new QPushButton("MEDIUM", this);
+    m_button->setGeometry(QRect(QPoint(100, 150),
+                                    QSize(200, 50)));
+    connect(m_button, SIGNAL(released()), this, SLOT(mediumButton()));
+
+    h_button = new QPushButton("HARD", this);
+    h_button->setGeometry(QRect(QPoint(100, 200),
+                                    QSize(200, 50)));
+    connect(h_button, SIGNAL(released()), this, SLOT(hardButton()));
+
+    score=0;
     fruits_to_level_up=5;
     fruit = new QPoint();
-    addFruit();
-    pause=false;
-    score=0;
     a=new QPoint(32,32);
     d=new QPoint(192,192);
     b=new QPoint(32,192);
     c=new QPoint(192,32);
     line = new QLine(32,104,88,104);
     line2 = new QLine(134,104,192,104);
+    direction = backward;
+    point = new QPoint();
+    point2 = new QPoint();
+    point3 = new QPoint();
+    point -> setX(120);
+    point -> setY(64);
+    point2 -> setX(120);
+    point2 -> setY(56);
+    point3 -> setX(120);
+    point3 -> setY(48);
+    snake.push_back(point);
+    snake.push_back(point2);
+    snake.push_back(point3);
+    game_level=1;
+    addFruit();
+    pause=false;
+
     srand(time(NULL));
+
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -43,9 +71,7 @@ if(game_state==not_started)
     painter.drawText(rect(),Qt::AlignTop,"\t\t\t\t\t\t\t\t\tSNAKE");
     painter.setFont(QFont("Times",30));
     painter.drawText(rect(),Qt::AlignTop,"\n\t\t\t\t\t\t\tChoose level:");
-    painter.setPen(Qt::blue);
-    painter.setFont(QFont("Times", 30));
-    painter.drawText(rect(),Qt::AlignCenter,"\n\nEasy - 1\nMedium - 2\nHard - 3 ");
+
 }
 
 if(game_state==started)
@@ -134,25 +160,24 @@ if(game_state==started)
 else if(game_state==game_over)
 {
 
-        for(unsigned i=0; i<snake.size()-3; i++)
-        {
-            delete snake[i];
-            snake[i]= 0;
-        }
-        snake.clear();
-        timer->stop();
-        delete timer;
-        delete point;
-        delete point2;
-        delete point3;
-        delete a;
-        delete d;
-        delete b;
-        delete c;
-        delete line;
-        delete line2;
-        delete fruit;
-
+    for(unsigned i=0; i<snake.size()-3; i++)
+    {
+        delete snake[i];
+        snake[i]= 0;
+    }
+    snake.clear();
+    timer->stop();
+    delete timer;
+    delete point;
+    delete point2;
+    delete point3;
+    delete a;
+    delete d;
+    delete b;
+    delete c;
+    delete line;
+    delete line2;
+    delete fruit;
         QString result;
         painter.setPen(Qt::black);
         painter.setFont(QFont("Times", 45));
@@ -305,39 +330,6 @@ if(game_state!=lvl_up && game_state!= game_over)
             break;
         case Qt::Key_Space:
             pause= !pause;
-            break;
-        case Qt::Key_1:
-            if(game_state==not_started)
-            {
-                timer = new QTimer(this);
-                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
-                timer->start(300);
-                game_state = started;
-                gm_level = easy;
-                points_for_fruit=10;
-            }
-            break;
-        case Qt::Key_2:
-            if(game_state==not_started)
-            {
-                timer = new QTimer(this);
-                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
-                timer->start(200);
-                game_state = started;
-                gm_level = medium;
-                points_for_fruit=20;
-            }
-            break;
-        case Qt::Key_3:
-            if(game_state==not_started)
-            {
-                timer = new QTimer(this);
-                connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
-                timer->start(100);
-                game_state = started;
-                gm_level = hard;
-                points_for_fruit=30;
-            }
             break;
     }
 }
@@ -511,4 +503,58 @@ for(unsigned i=0; i<snake.size()-3; i++)
 
 }
 //*************************************************************
+void MainWindow::hardButton()
+{
+    if(game_state==not_started)
+    {
+        timer = new QTimer(this);
+        connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+        timer->start(100);
+        game_state = started;
+        gm_level = hard;
+        points_for_fruit=30;
+    }
+   game_state=started;
+   gm_level = hard;
+   delete e_button;
+   delete m_button;
+   delete h_button;
+}
+//****************************************************************
+void MainWindow::easyButton()
+{
+    if(game_state==not_started)
+    {
+        timer = new QTimer(this);
+        connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+        timer->start(300);
+        game_state = started;
+        gm_level = hard;
+        points_for_fruit=10;
+    }
+   game_state=started;
+   gm_level = easy;
+   delete e_button;
+   delete m_button;
+   delete h_button;
+}
+//******************************************************************
+void MainWindow::mediumButton()
+{
+    if(game_state==not_started)
+    {
+        timer = new QTimer(this);
+        connect(timer,SIGNAL(timeout()),this,SLOT(TimerSlot()));
+        timer->start(200);
+        game_state = started;
+        gm_level = hard;
+        points_for_fruit=20;
+    }
+   game_state=started;
+   gm_level = medium;
+   delete e_button;
+   delete m_button;
+   delete h_button;
+}
+//*******************************************************************
 

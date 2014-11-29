@@ -5,6 +5,7 @@
 #include <QtWidgets>
 #include <vector>
 #include <time.h>
+#include <QCoreApplication>
 
 namespace Ui {
 class MainWindow;
@@ -62,6 +63,7 @@ protected:
     QTimer *timer;
     QPoint *point,*point2,*point3,*fruit,*a,*b,*c,*d;
     QLine *line,*line2;
+    QPushButton *e_button,*m_button,*h_button;
 
     std::vector <QPoint*> snake;
     void setPossition();
@@ -74,6 +76,9 @@ protected:
 
 public slots:
     void TimerSlot();
+    void easyButton();
+    void mediumButton();
+    void hardButton();
 };
 
 #endif // MAINWINDOW_H
