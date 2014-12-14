@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/pics">
+        <file>car1.jpeg</file>
+        <file>car2.jpeg</file>
+        <file>car3.jpeg</file>
+        <file>audi.png</file>
+        <file>car0.jpeg</file>
+        <file>dodge.jpg</file>
+        <file>car4.jpeg</file>
+        <file>car4.png</file>
+        <file>car5.jpeg</file>
+        <file>car7.jpeg</file>
+        <file>car6.jpeg</file>
+        <file>car8.jpeg</file>
+        <file>car9.jpeg</file>
+        <file>car10.jpeg</file>
+        <file>car11.jpeg</file>
+        <file>car12.jpeg</file>
+        <file>car13.jpeg</file>
+        <file>car14.jpeg</file>
+        <file>car15.jpeg</file>
+        <file>car16.jpeg</file>
+        <file>car18.jpeg</file>
+        <file>car17.jpeg</file>
+        <file>car19.jpeg</file>
+        <file>car20.jpeg</file>
+    </qresource>
+</RCC>
