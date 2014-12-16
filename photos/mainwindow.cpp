@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    columns = new QLineEdit(this);
+    lines = new QLineEdit(this);
     for(unsigned int i=0; i<15; ++i)
     {
         pic[i] = new QPixmap();
@@ -18,7 +19,15 @@ MainWindow::MainWindow(QWidget *parent) :
         picBrush[i] = new QBrush();
         picPalette[i] = new QPalette();
     }
-    createButtons();
+    QRect rec = QApplication::desktop()->screenGeometry();
+    x = rec.width();
+    y = rec.height();
+    lines->setGeometry(x-200,20,100,30);
+    columns->setGeometry(x-320,20,100,30);
+    lines->setText("Type lines");
+    columns->setText("Type columns");
+
+    createButtons(10,10);
     createGrayPics();
     for(int i=0; i<15; ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
@@ -39,36 +48,58 @@ MainWindow::~MainWindow()
     delete ui;
 }
 //***************************************************************
-void MainWindow::createButtons()
+void MainWindow::createButtons(unsigned int k, unsigned int w)
 {
-    for(unsigned int i=0; i<15; ++i)
+    QString abc;
+    unsigned int picsQuantity = 15;
+    unsigned int index;
+    int picX;
+    int picY;
+    float scale;
+    if(k>w) scale = (float)5/(float)k;
+    else scale = (float)5/(float)w;
+    picX = (float)200*scale;
+    picY = (float)150*scale;
+    int gapX = (x-(k*picX))/(k+1);
+    int gapY = (y-(w*picY))/(w+1);
+    if(gapX<15)
+    {
+        int moreSpace =(15-gapX)*(k+1);
+        picX = picX - moreSpace/k;
+        gapX=15;
+    }
+    if(gapY<20)
+    {
+        int moreSpace = (20-gapY)*(w+1);
+        picY = picY - moreSpace/w;
+        gapY=20;
+    }
+    for(unsigned int i=0; i<picsQuantity; ++i) // ładuje obrazki do tablicy pic
     {
         abc = ":pics/car";
         abc.append(QString::number(i));
         abc.append(".jpeg");
 
        pic[i]->load(abc);
-       *pic[i]=pic[i]->scaled(200,150,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+       *pic[i]=pic[i]->scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+
+       picBrush[i]->setTexture(*pic[i]);
+
+       picPalette[i]->setBrush(QPalette::Button,*(picBrush[i]));
+
+
+       picButton[i]->setFlat(true);
+       picButton[i]->setAutoFillBackground(true);
+       picButton[i]->setPalette(*picPalette[i]);
     }
-    unsigned int a=0;
-    if(sizeof(pic)/4%5)
-        a=1;
 
-    for(unsigned int j=0; j<sizeof(pic)/4/5 + a; ++j)
-        for(unsigned int i=0 ; i<5; ++i)
+    for(unsigned int j=0; j<w; ++j)
+        for(unsigned int i=0 ; i<k; ++i)
         {
-            if(i==(sizeof(pic)/4%5) && j==sizeof(pic)/4/5)
+            index = i+k*j;
+            if(index>=picsQuantity)
                 break;
-
-            picBrush[i+j*5]->setTexture(*pic[i+j*5]);
-
-            picPalette[i+j*5]->setBrush(QPalette::Button,*(picBrush[i+j*5]));
-
-
-            picButton[i+j*5]->setFlat(true);
-            picButton[i+j*5]->setAutoFillBackground(true);
-            picButton[i+j*5]->setPalette(*picPalette[i+j*5]);
-            picButton[i+j*5]->setGeometry((50+i*250),(50+j*200),(*pic[0]).width(),(*pic[0]).height());
+            picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
         }
 }
 
@@ -95,7 +126,7 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
     {
         for (int j = z; j < height; j+=5)
         {
-            gray = qGray(0,0,0);
+            gray = qGray(0);
             image.setPixel(i, j, qRgb(gray, gray, gray));
         }
     }
@@ -113,21 +144,25 @@ void MainWindow::createGrayPics()
 void MainWindow::picButtons()
 {
     int a = sender()->objectName().toInt();
- if(!isGray[a])
- {
+    if(!isGray[a])
+    {
     picBrush[a]->setTexture(*grayPic[a]);
     picPalette[a]->setBrush(QPalette::Button,*(picBrush[a]));
     picButton[a]->setPalette(*picPalette[a]);
     isGray[a]=true;
- }
- else
- {
-     picBrush[a]->setTexture(*pic[a]);
-     picPalette[a]->setBrush(QPalette::Button,*(picBrush[a]));
-     picButton[a]->setPalette(*picPalette[a]);
-     isGray[a]=false;
- }
-
+    }
+    else
+    {
+    picBrush[a]->setTexture(*pic[a]);
+    picPalette[a]->setBrush(QPalette::Button,*(picBrush[a]));
+    picButton[a]->setPalette(*picPalette[a]);
+    isGray[a]=false;
+    }
 }
-
-
+//********************************************************************
+void MainWindow::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setFont(QFont("Times", 20));
+    painter.drawText(x-220,45, "X");
+}
