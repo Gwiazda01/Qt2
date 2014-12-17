@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     columns = new QLineEdit(this);
     lines = new QLineEdit(this);
     picsQuantity = 0;
-    for(unsigned int i=0; i<15; ++i)
+    for(unsigned int i=0; i<21; ++i)
     {        
         abc = ":pics/car";
         abc.append(QString::number(i));
@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(resizeButton, SIGNAL(released()), this, SLOT(lineEdit()));
     createButtons(5,3);
 
-    for(int i=0; i<15; ++i)
+    for(unsigned int i=0; i<picsQuantity; ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
 }
 
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    for(unsigned int i=0; i<15; ++i)
+    for(unsigned int i=0; i<picsQuantity; ++i)
     {
         delete picButton[i];
 

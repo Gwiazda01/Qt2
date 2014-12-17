@@ -22,7 +22,7 @@ protected:
     void makeGray(QPixmap, int );
     QString abc;
     QPushButton *resizeButton;
-    CustomButton *picButton[15];
+    CustomButton *picButton[21];
     unsigned int x,y, picsQuantity;
     QLineEdit *columns, *lines;
 public slots:
