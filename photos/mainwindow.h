@@ -20,9 +20,10 @@ protected:
     void paintEvent(QPaintEvent *);
     void createButtons(unsigned int, unsigned int);
     void makeGray(QPixmap, int );
+    QString abc;
     QPushButton *resizeButton;
     CustomButton *picButton[15];
-    int x,y;
+    unsigned int x,y, picsQuantity;
     QLineEdit *columns, *lines;
 public slots:
     void picButtons();

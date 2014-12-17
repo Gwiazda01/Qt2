@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     columns = new QLineEdit(this);
     lines = new QLineEdit(this);
-    QString abc;
+    picsQuantity = 0;
     for(unsigned int i=0; i<15; ++i)
     {        
         abc = ":pics/car";
@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
         abc.append(".jpeg");
         picButton[i] = new CustomButton(abc, this);
         picButton[i]->setObjectName(QString::number(i));
+        ++picsQuantity;
     }
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
@@ -30,8 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resizeButton->setGeometry(x-95,20,50,30);
     connect(resizeButton, SIGNAL(released()), this, SLOT(lineEdit()));
     createButtons(5,3);
-    for(unsigned int i=0; i<15; ++i)
-        makeGray(picButton[i]->picture, i);
+
     for(int i=0; i<15; ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
 }
@@ -53,7 +53,10 @@ void MainWindow::createButtons(unsigned int k, unsigned int w)
 {
     if(k<=0) k=1;
     if(w<=0) w=1;
-    unsigned int picsQuantity = 15;
+    for(unsigned int i=k*w ; i<picsQuantity; ++i)
+    {
+        picButton[i]->setGeometry(0,0,0,0);
+    }
     unsigned int index;
     int picX;
     int picY;
@@ -76,9 +79,10 @@ void MainWindow::createButtons(unsigned int k, unsigned int w)
         picY = picY - moreSpace/w;
         gapY=50;
     }
-    for(unsigned int i=0; i<picsQuantity; ++i) // ładuje obrazki do tablicy pic
+    for(unsigned int i=0; i<picsQuantity; ++i)
     {
         picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+        makeGray(picButton[i]->picture, i);
         picButton[i]->picBrush.setTexture(picButton[i]->picture);
         picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
         picButton[i]->setPalette(picButton[i]->picPalette);
@@ -157,4 +161,5 @@ void MainWindow::lineEdit()
     int k = columns->text().toInt();
     int l = lines->text().toInt();
     createButtons(k, l);
+    update();
 }
