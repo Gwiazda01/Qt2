@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "custombutton.h"
+#include <vector>
 
 namespace Ui {
 
@@ -18,11 +19,11 @@ public:
     ~MainWindow();
 protected:
     void paintEvent(QPaintEvent *);
-    void createButtons(unsigned int, unsigned int);
+    void createButtons(int, int);
     void makeGray(QPixmap, int );
     QString abc;
     QPushButton *resizeButton;
-    CustomButton *picButton[21];
+    std::vector <CustomButton*> picButton;
     unsigned int x,y, picsQuantity;
     QLineEdit *columns, *lines;
 public slots:

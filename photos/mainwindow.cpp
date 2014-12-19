@@ -16,10 +16,19 @@ MainWindow::MainWindow(QWidget *parent) :
         abc = ":pics/car";
         abc.append(QString::number(i));
         abc.append(".jpeg");
-        picButton[i] = new CustomButton(abc, this);
+        picButton.push_back(new CustomButton(abc, this));
         picButton[i]->setObjectName(QString::number(i));
         ++picsQuantity;
     }
+    QFileInfoList info = QDir("C:/Users/Marta/Desktop/Podlogi/samochod").entryInfoList(QStringList()<<"*.jpg",
+                                                                                       QDir::Files, QDir::Name);
+    foreach(const QFileInfo &inf, info)
+    {
+        picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
+        picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
+        ++picsQuantity;
+    }
+
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
@@ -49,53 +58,65 @@ MainWindow::~MainWindow()
     delete ui;
 }
 //***************************************************************
-void MainWindow::createButtons(unsigned int k, unsigned int w)
+void MainWindow::createButtons(int k,int w)
 {
-    if(k<=0) k=1;
-    if(w<=0) w=1;
-    for(unsigned int i=k*w ; i<picsQuantity; ++i)
+    if(k<=0 || w<=0 || k>10 || w>10)
     {
-        picButton[i]->setGeometry(0,0,0,0);
+        QMessageBox::information(this,
+           "File input error",
+           "Bledne dane wprowadzone do funkcji CreateButtons\nDane wejsciowe musza zmiescic sie w zakresie (1; 10)"
+           );
     }
-    unsigned int index;
-    int picX;
-    int picY;
-    float scale;
-    if(k>w) scale = (float)5/(float)k;
-    else scale = (float)5/(float)w;
-    picX = (float)200*scale;
-    picY = (float)150*scale;
-    int gapX = (x-(k*picX))/(k+1);
-    int gapY = (y-(w*picY))/(w+1);
-    if(gapX<50)
+    else
     {
-        int moreSpace =(50-gapX)*(k+1);
-        picX = picX - moreSpace/k;
-        gapX=50;
-    }
-    if(gapY<50)
-    {
-        int moreSpace = (50-gapY)*(w+1);
-        picY = picY - moreSpace/w;
-        gapY=50;
-    }
-    for(unsigned int i=0; i<picsQuantity; ++i)
-    {
-        picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
-        makeGray(picButton[i]->picture, i);
-        picButton[i]->picBrush.setTexture(picButton[i]->picture);
-        picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
-        picButton[i]->setPalette(picButton[i]->picPalette);
-    }
-
-    for(unsigned int j=0; j<w; ++j)
-        for(unsigned int i=0 ; i<k; ++i)
+        for(unsigned int i=(unsigned int)k*w ; i<picsQuantity; ++i)
         {
-            index = i+k*j;
+            picButton[i]->setGeometry(0,0,0,0);
+        }
+        unsigned int index;
+        int picX;
+        int picY;
+        float scale;
+        if(k>w) scale = (float)5/(float)k;
+        else scale = (float)5/(float)w;
+        picX = (float)200*scale;
+        picY = (float)150*scale;
+        int gapX = (x-(k*picX))/(k+1);
+        int gapY = (y-(w*picY))/(w+1);
+        if(gapX<50)
+        {
+            int moreSpace =(50-gapX)*(k+1);
+            picX = picX - moreSpace/k;
+            gapX=50;
+        }
+        if(gapY<50)
+        {
+            int moreSpace = (50-gapY)*(w+1);
+            picY = picY - moreSpace/w;
+            gapY=50;
+        }
+        for(unsigned int i=0; i<picsQuantity; ++i)
+        {
+            picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+            makeGray(picButton[i]->picture, i);
+            picButton[i]->picBrush.setTexture(picButton[i]->picture);
+            picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
+            picButton[i]->setPalette(picButton[i]->picPalette);
+        }
+
+        for(unsigned int j=0; j<(unsigned int)w; ++j)
+        {
+            for(unsigned int i=0 ; i<(unsigned int)k; ++i)
+            {
+                index = i+(unsigned int)k*j;
+                if(index>=picsQuantity)
+                    break;
+                picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
+            }
             if(index>=picsQuantity)
                 break;
-            picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
         }
+    }
 }
 
 //****************************************************************
