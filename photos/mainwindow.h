@@ -21,16 +21,19 @@ public:
     ~MainWindow();
 protected:
     void paintEvent(QPaintEvent *);
-    void createButtons(int, int);
+
     void makeGray(QPixmap, int );
     QString abc;
-    QPushButton *resizeButton;
+    QPushButton *resizeButton, *nextPage, *previousPage;
     std::vector <CustomButton*> picButton;
-    unsigned int x,y, picsQuantity;
+    unsigned int x,y, picsQuantity, page, k, w, size;
     QLineEdit *columns, *lines;
 public slots:
     void picButtons();
-    void lineEdit();
+    void createButtons();
+    void nextButton();
+    void previousButton();
+    void resizeBtn();
 
 private:
     Ui::MainWindow *ui;

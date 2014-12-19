@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
     f.close();
+
+
     QDir dir("C:/Users/Marta/Desktop/Podlogi/");
     dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Usuniete");
     dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia");
@@ -40,14 +42,22 @@ MainWindow::MainWindow(QWidget *parent) :
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
-    lines->setGeometry(x-200,20,100,30);
-    columns->setGeometry(x-320,20,100,30);
-    lines->setText("Type lines");
-    columns->setText("Type columns");
+    lines->setGeometry(x-200,30,100,20);
+    columns->setGeometry(x-320,30,100,20);
+
     resizeButton = new QPushButton("Resize",this);
-    resizeButton->setGeometry(x-95,20,50,30);
-    connect(resizeButton, SIGNAL(released()), this, SLOT(lineEdit()));
-    createButtons(5,3);
+    resizeButton->setGeometry(x-95,30,50,20);
+    connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
+
+    page = 1;
+    nextPage = new QPushButton("Next Page",this);
+    previousPage = new QPushButton("Previous Page", this);
+    nextPage->setGeometry(x-425,30,75,20);
+    previousPage->setGeometry(x-500,30,75,20);
+    connect(nextPage, SIGNAL(released()), this, SLOT(nextButton()));
+    connect(previousPage, SIGNAL(released()), this, SLOT(previousButton()));
+    k=5, w=3;
+    createButtons();
 
     for(unsigned int i=0; i<picsQuantity; ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
@@ -63,11 +73,32 @@ MainWindow::~MainWindow()
 
     }
     delete resizeButton;
+    delete columns;
+    delete lines;
+
     delete ui;
 }
 //***************************************************************
-void MainWindow::createButtons(int k,int w)
+void MainWindow::createButtons()
 {
+    if(picsQuantity%(k*w))
+            size = picsQuantity/(k*w) + 1;
+        else
+            size = picsQuantity/(k*w);
+
+    if(page!=1)
+        previousPage->setEnabled(true);
+    else
+        previousPage->setEnabled(false);
+
+
+    if(page!=size)
+        nextPage->setEnabled(true);
+    else
+        nextPage->setEnabled(false);
+
+
+
     if(k<=0 || w<=0 || k>10 || w>10)
     {
         QMessageBox::information(this,
@@ -77,7 +108,11 @@ void MainWindow::createButtons(int k,int w)
     }
     else
     {
-        for(unsigned int i=(unsigned int)k*w ; i<picsQuantity; ++i)
+        for(unsigned int i=page*(unsigned int)k*w ; i<picsQuantity; ++i)
+        {
+            picButton[i]->setGeometry(0,0,0,0);
+        }
+        for(unsigned int i=0 ; i<( (page-1)*k*w); ++i)
         {
             picButton[i]->setGeometry(0,0,0,0);
         }
@@ -119,7 +154,7 @@ void MainWindow::createButtons(int k,int w)
         {
             for(unsigned int i=0 ; i<(unsigned int)k; ++i)
             {
-                index = i+(unsigned int)k*j;
+                index = i+(unsigned int)k*j+ (page-1)*k*w;
                 if(index>=picsQuantity)
                     break;
                 picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
@@ -128,6 +163,7 @@ void MainWindow::createButtons(int k,int w)
                 break;
         }
     }
+    update();
 }
 
 //****************************************************************
@@ -206,14 +242,36 @@ void MainWindow::picButtons()
 void MainWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setFont(QFont("Arial", 20));
-    painter.drawText(x-219,45, "X");
+    painter.setFont(QFont("Arial", 14));
+    painter.drawText(x-216,46, "X");
+    painter.setFont(QFont("Times", 10));
+    painter.drawText(x-315,28, "Columns:");
+    painter.drawText(x-195,28, "Lines:");
 }
 //*********************************************************************
-void MainWindow::lineEdit()
+void MainWindow::nextButton()
 {
-    int k = columns->text().toInt();
-    int l = lines->text().toInt();
-    createButtons(k, l);
-    update();
+        if(page!=size)
+            ++page;
+
+    createButtons();
+}
+//*********************************************************************
+void MainWindow::previousButton()
+{
+    if(page!=1)
+        --page;
+
+    createButtons();
+}
+//********************************************************************
+void MainWindow::resizeBtn()
+{
+    page = 1;
+    if(!columns->text().isEmpty())
+        k = columns->text().toInt();
+
+    if(!lines->text().isEmpty())
+        w = lines->text().toInt();
+    createButtons();
 }
