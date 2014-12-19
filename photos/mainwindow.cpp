@@ -33,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
     f.close();
+    QDir dir("C:/Users/Marta/Desktop/Podlogi/");
+    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Usuniete");
+    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia");
+    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Zaakceptowane");
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
@@ -103,7 +107,10 @@ void MainWindow::createButtons(int k,int w)
         {
             picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
             makeGray(picButton[i]->picture, i);
-            picButton[i]->picBrush.setTexture(picButton[i]->picture);
+            if(!picButton[i]->isGray)
+                picButton[i]->picBrush.setTexture(picButton[i]->picture);
+            else
+                picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
             picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
             picButton[i]->setPalette(picButton[i]->picPalette);
         }
@@ -157,52 +164,43 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
 //******************************************************************
 void MainWindow::picButtons()
 {
-    int a = sender()->objectName().toInt();
-    //if(!picButton[a]->isGray)
-    //{
+        int a = sender()->objectName().toInt();
         QMessageBox msgBox;
-        msgBox.setWindowTitle("Co zrobic z plikiem?");
+        msgBox.setWindowTitle("Do jakiego folderu przeniesc zdjecie?");
         msgBox.setIcon(QMessageBox::Question);
-        QPushButton *cancelButton = msgBox.addButton(tr("Usunac"), QMessageBox::ActionRole);
-        QPushButton *forConsiderationButton = msgBox.addButton(tr("Dobry"), QMessageBox::ActionRole);
-        QPushButton *abortButton = msgBox.addButton(tr("Do rozpatrzenia"), QMessageBox::ActionRole);
+        QPushButton *deleteButton = msgBox.addButton(tr("Usuniete"), QMessageBox::ActionRole);
+        QPushButton *forConsiderationButton = msgBox.addButton(tr("Do rozpatrzenia"), QMessageBox::ActionRole);
+        QPushButton *acceptButton = msgBox.addButton(tr("Zaakceptowane"), QMessageBox::ActionRole);
 
         msgBox.exec();
-
-        if (msgBox.clickedButton() == cancelButton)
+        if (msgBox.clickedButton() == deleteButton)
         {
             picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            picButton[a]->isGray=true;
-            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/usuniete/"+picButton[a]->fileName) );
+            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Usuniete/"+picButton[a]->fileName) );
+            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Usuniete/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == forConsiderationButton)
+        {
+            picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
+            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
+            picButton[a]->setPalette(picButton[a]->picPalette);
+            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia/"+picButton[a]->fileName) );
+            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
+        }
+        else if(msgBox.clickedButton() == acceptButton)
         {
             picButton[a]->picBrush.setTexture(picButton[a]->picture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            picButton[a]->isGray=false;
-            QFile::rename(("C:/Users/Marta/Desktop/Podlogi/usuniete/"+picButton[a]->fileName),picButton[a]->filePath);
-        }
-        else if(msgBox.clickedButton() == abortButton)
-        {
+            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Zaakceptowane/"+picButton[a]->fileName) );
+            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Zaakceptowane/"+picButton[a]->fileName;
+            picButton[a]->isGray = false;
 
         }
-   /* picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
-    picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-    picButton[a]->setPalette(picButton[a]->picPalette);
-    picButton[a]->isGray=true;
-    QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/usuniete/"+picButton[a]->fileName) );
-    //}
-    //else
-    //{
-    picButton[a]->picBrush.setTexture(picButton[a]->picture);
-    picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-    picButton[a]->setPalette(picButton[a]->picPalette);
-    picButton[a]->isGray=false;
-    QFile::rename(("C:/Users/Marta/Desktop/Podlogi/usuniete/"+picButton[a]->fileName),picButton[a]->filePath);
-    //}*/
 }
 //********************************************************************
 void MainWindow::paintEvent(QPaintEvent *)
