@@ -3,6 +3,8 @@
 
 #include "custombutton.h"
 #include <vector>
+#include <stdio.h>
+#include <stdlib.h>
 
 namespace Ui {
 

@@ -158,8 +158,6 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
 void MainWindow::picButtons()
 {
     int a = sender()->objectName().toInt();
-    //if(!picButton[a]->isGray)
-    //{
         QMessageBox msgBox;
         msgBox.setWindowTitle("Co zrobic z plikiem?");
         msgBox.setIcon(QMessageBox::Question);
