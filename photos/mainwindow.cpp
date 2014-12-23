@@ -8,59 +8,116 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    columns = new QLineEdit(this);
-    lines = new QLineEdit(this);
     picsQuantity = 0;
-    QFile f("C:/Users/Marta/Desktop/Podlogi/sciezki.txt");
-    if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
-        QMessageBox::information(this,
-           "File open error",
-           "Nie mozna otworzyc katalogu ze sciazkami do zdjec."
-           );
-    QTextStream in(&f);
-    in.setCodec("UTF-8");
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-        QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
-                                                                                       QDir::Files, QDir::Name);
-        foreach(const QFileInfo &inf, info)
-        {
-            picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
-            picButton[picsQuantity]->fileName = inf.fileName();
-            picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
-            ++picsQuantity;
-        }
-    }
-    f.close();
+    isStarted = false;
 
-
-    QDir dir("C:/Users/Marta/Desktop/Podlogi/");
-    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Usuniete");
-    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia");
-    dir.mkpath("C:/Users/Marta/Desktop/Podlogi/Zaakceptowane");
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
-    lines->setGeometry(x-200,30,100,20);
-    columns->setGeometry(x-320,30,100,20);
 
-    resizeButton = new QPushButton("Resize",this);
-    resizeButton->setGeometry(x-95,30,50,20);
-    connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
+    bool ok, katalog;
 
+    QMessageBox fPath;
+    fPath.setWindowTitle("Wybór ścieżki");
+    fPath.setText("Do czego ścieżki będziesz wpisywać?");
+    fPath.setIcon(QMessageBox::Question);
+    QPushButton *catalogButton = fPath.addButton(tr("Katalogi"), QMessageBox::ActionRole);
+    QPushButton *fileButton = fPath.addButton(tr("Pliki"), QMessageBox::ActionRole);
+
+    fPath.exec();
+    if (fPath.clickedButton() == catalogButton)
+        katalog = true;
+    else if (fPath.clickedButton() == fileButton)
+        katalog = false;
+
+
+
+    QString filePath;
+    if(katalog)
+        filePath = QInputDialog::getText(this, tr("Wybór ścieżki do katalogów"),
+                                                            tr("Ścieżka pliku *.txt z katalogami:"), QLineEdit::Normal,
+                                                            QDir::root().dirName(),&ok);
+    else
+        filePath = QInputDialog::getText(this, tr("Wybór ścieżki do plików"),
+                                                            tr("Ścieżka pliku *.txt z plikami:"), QLineEdit::Normal,
+                                                            QDir::root().dirName(),&ok);
+
+    isStarted = true;
+    if(ok && !filePath.isEmpty())
+    {
+        QFile f(filePath);
+        if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
+                QMessageBox::information(this,
+                "File open error",
+                "Nie mozna otworzyc katalogu ze sciazkami do zdjec."
+                );
+        QTextStream in(&f);
+        in.setCodec("UTF-8");
+        while(!in.atEnd())
+        {
+            QString line = in.readLine();
+            if(katalog)
+            {
+                QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
+                                                                                        QDir::Files, QDir::Name);
+                foreach(const QFileInfo &inf, info)
+                {
+                    picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
+                    picButton[picsQuantity]->fileName = inf.fileName();
+                    picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
+                    ++picsQuantity;
+                }
+            }
+            else
+            {
+                    QFileInfo file(line);
+                    picButton.push_back(new CustomButton(file.absoluteFilePath(), this));
+                    picButton[picsQuantity]->fileName = file.fileName();
+                    picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
+                    ++picsQuantity;
+
+            }
+        }
+        f.close();
+    }
+    else
+        QMessageBox::information(this,
+        "File path error",
+        "Błąd odczytu ścieżki pliku."
+        );
     page = 1;
+
+    columns = new QLineEdit(this);
+    lines = new QLineEdit(this);
+    resizeButton = new QPushButton("Resize",this);
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
+    acceptButton = new QPushButton("Accept photos", this);
+
+    lines->setGeometry(x-200,30,100,20);
+    columns->setGeometry(x-320,30,100,20);
+    resizeButton->setGeometry(x-95,30,50,20);
     nextPage->setGeometry(x-425,30,75,20);
     previousPage->setGeometry(x-500,30,75,20);
+    acceptButton->setGeometry(x-625,30,75,20);
+
+    connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
     connect(nextPage, SIGNAL(released()), this, SLOT(nextButton()));
     connect(previousPage, SIGNAL(released()), this, SLOT(previousButton()));
+    connect(acceptButton, SIGNAL(released()), this, SLOT(acceptAction()));
+
     k=5, w=3;
     createButtons();
-
     for(unsigned int i=0; i<picsQuantity; ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
+
+
+    QDir dir = QDir::root();
+    root = dir.absolutePath();
+    dir.mkpath(root + "/Zdjecia/Usuniete");
+    dir.mkpath(root + "/Zdjecia/Do rozpatrzenia");
+    dir.mkpath(root + "/Zdjecia/Zaakceptowane");
+
 }
 
 
@@ -75,7 +132,6 @@ MainWindow::~MainWindow()
     delete resizeButton;
     delete columns;
     delete lines;
-
     delete ui;
 }
 //***************************************************************
@@ -92,7 +148,7 @@ void MainWindow::createButtons()
         previousPage->setEnabled(false);
 
 
-    if(page!=size)
+    if(page<size)
         nextPage->setEnabled(true);
     else
         nextPage->setEnabled(false);
@@ -140,7 +196,7 @@ void MainWindow::createButtons()
         }
         for(unsigned int i=0; i<picsQuantity; ++i)
         {
-            picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+            picButton[i]->picture = picButton[i]->originalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
             makeGray(picButton[i]->picture, i);
             if(!picButton[i]->isGray)
                 picButton[i]->picBrush.setTexture(picButton[i]->picture);
@@ -199,14 +255,16 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
 }
 //******************************************************************
 void MainWindow::picButtons()
-{
+{    
         int a = sender()->objectName().toInt();
         QMessageBox msgBox;
-        msgBox.setWindowTitle("Do jakiego folderu przeniesc zdjecie?");
+        msgBox.setWindowTitle("Przeniesienie zdjęcia");
+        msgBox.setText("Do jakiego folderu przeniesc zdjecie?");
         msgBox.setIcon(QMessageBox::Question);
         QPushButton *deleteButton = msgBox.addButton(tr("Usuniete"), QMessageBox::ActionRole);
         QPushButton *forConsiderationButton = msgBox.addButton(tr("Do rozpatrzenia"), QMessageBox::ActionRole);
-        QPushButton *acceptButton = msgBox.addButton(tr("Zaakceptowane"), QMessageBox::ActionRole);
+        QPushButton *acptButton = msgBox.addButton(tr("Zaakceptowane"), QMessageBox::ActionRole);
+        QPushButton *abortButton = msgBox.addButton(tr("Cofnij zmiany/Anuluj"), QMessageBox::ActionRole);
 
         msgBox.exec();
         if (msgBox.clickedButton() == deleteButton)
@@ -214,8 +272,8 @@ void MainWindow::picButtons()
             picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Usuniete/"+picButton[a]->fileName) );
-            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Usuniete/"+picButton[a]->fileName;
+            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Usuniete/"+picButton[a]->fileName) );
+            picButton[a]->filePath = root + "/Zdjecia/Usuniete/"+picButton[a]->fileName;
             picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == forConsiderationButton)
@@ -223,17 +281,26 @@ void MainWindow::picButtons()
             picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia/"+picButton[a]->fileName) );
-            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Do rozpatrzenia/"+picButton[a]->fileName;
+            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName) );
+            picButton[a]->filePath = root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName;
             picButton[a]->isGray = true;
         }
-        else if(msgBox.clickedButton() == acceptButton)
+        else if (msgBox.clickedButton() == acptButton)
+        {
+            picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
+            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
+            picButton[a]->setPalette(picButton[a]->picPalette);
+            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName) );
+            picButton[a]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
+        }
+        else if(msgBox.clickedButton() == abortButton)
         {
             picButton[a]->picBrush.setTexture(picButton[a]->picture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, ("C:/Users/Marta/Desktop/Podlogi/Zaakceptowane/"+picButton[a]->fileName) );
-            picButton[a]->filePath = "C:/Users/Marta/Desktop/Podlogi/Zaakceptowane/"+picButton[a]->fileName;
+            QFile::rename(picButton[a]->filePath, picButton[a]->originalFilePath );
+            picButton[a]->filePath = picButton[a]->originalFilePath;
             picButton[a]->isGray = false;
 
         }
@@ -242,11 +309,14 @@ void MainWindow::picButtons()
 void MainWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setFont(QFont("Arial", 14));
-    painter.drawText(x-216,46, "X");
-    painter.setFont(QFont("Times", 10));
-    painter.drawText(x-315,28, "Columns:");
-    painter.drawText(x-195,28, "Lines:");
+    if(isStarted)
+    {
+        painter.setFont(QFont("Arial", 14));
+        painter.drawText(x-216,46, "X");
+        painter.setFont(QFont("Times", 10));
+        painter.drawText(x-315,28, "Columns:");
+        painter.drawText(x-195,28, "Lines:");
+    }
 }
 //*********************************************************************
 void MainWindow::nextButton()
@@ -274,4 +344,34 @@ void MainWindow::resizeBtn()
     if(!lines->text().isEmpty())
         w = lines->text().toInt();
     createButtons();
+}
+//****************************************************************************
+void MainWindow::acceptAction()
+{
+        QMessageBox acceptBox;
+        acceptBox.setWindowTitle("Akceptacja zdjęć?");
+        acceptBox.setText("Czy przenieść niezaznaczone zdjęcia do folderu \"Zaakceptowane\"?");
+        acceptBox.setIcon(QMessageBox::Question);
+        QPushButton *YesButton = acceptBox.addButton(tr("Tak"), QMessageBox::ActionRole);
+        QPushButton *NoButton = acceptBox.addButton(tr("Nie"), QMessageBox::ActionRole);
+        acceptBox.exec();
+        if(acceptBox.clickedButton() == YesButton)
+        {
+                for(unsigned int i=0; i<picsQuantity; ++i)
+                {
+                    if(picButton[i]->isGray)
+                    {
+                        picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
+                        picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
+                        picButton[i]->setPalette(picButton[i]->picPalette);
+                        QFile::rename(picButton[i]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName) );
+                        picButton[i]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName;
+                        picButton[i]->isGray = true;
+                    }
+                }
+        }
+        else if(acceptBox.clickedButton() == NoButton)
+        {
+            acceptBox.close();
+        }
 }
