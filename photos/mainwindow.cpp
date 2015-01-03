@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     x = rec.width();
     y = rec.height();
 
-    bool ok, katalog;
+    bool katalog;
 
     QMessageBox fPath;
     fPath.setWindowTitle("Wybór ścieżki");
@@ -31,27 +31,28 @@ MainWindow::MainWindow(QWidget *parent) :
         katalog = false;
 
 
-
     QString filePath;
+    //QFileDialog dialog(this, tr("Ścieżki"), QDir::homePath(), "Text files (*.txt);; Any file (*)");
     if(katalog)
-        filePath = QInputDialog::getText(this, tr("Wybór ścieżki do katalogów"),
-                                                            tr("Ścieżka pliku *.txt z katalogami:"), QLineEdit::Normal,
-                                                            QDir::root().dirName(),&ok);
+        filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do katalogów"),
+                                                        QDir::homePath(),
+                                                        tr("Text files (*.txt);;Any file (*)"));
+        //filePath = dialog.getOpenFileName();
     else
-        filePath = QInputDialog::getText(this, tr("Wybór ścieżki do plików"),
-                                                            tr("Ścieżka pliku *.txt z plikami:"), QLineEdit::Normal,
-                                                            QDir::root().dirName(),&ok);
-
+        filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do plików"),
+                                                        QDir::homePath(),
+                                                        tr("Text files (*.txt);;Any file (*)"));
+        //filePath = dialog.getOpenFileName();
     isStarted = true;
-    if(ok && !filePath.isEmpty())
+    if(!filePath.isEmpty())
     {
-        QFile f(filePath);
-        if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        QFile file(filePath);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
                 QMessageBox::information(this,
                 "File open error",
                 "Nie mozna otworzyc katalogu ze sciazkami do zdjec."
                 );
-        QTextStream in(&f);
+        QTextStream in(&file);
         in.setCodec("UTF-8");
         while(!in.atEnd())
         {
@@ -78,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
             }
         }
-        f.close();
+        file.close();
     }
     else
         QMessageBox::information(this,
@@ -97,9 +98,9 @@ MainWindow::MainWindow(QWidget *parent) :
     lines->setGeometry(x-200,30,100,20);
     columns->setGeometry(x-320,30,100,20);
     resizeButton->setGeometry(x-95,30,50,20);
-    nextPage->setGeometry(x-425,30,75,20);
-    previousPage->setGeometry(x-500,30,75,20);
-    acceptButton->setGeometry(x-625,30,75,20);
+    nextPage->setGeometry(x-425,30,85,20);
+    previousPage->setGeometry(x-510,30,90,20);
+    acceptButton->setGeometry(x-630,30,95,20);
 
     connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
     connect(nextPage, SIGNAL(released()), this, SLOT(nextButton()));
@@ -112,11 +113,11 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
 
 
-    QDir dir = QDir::root();
+    QDir dir = QDir::home();
     root = dir.absolutePath();
-    dir.mkpath(root + "/Zdjecia/Usuniete");
-    dir.mkpath(root + "/Zdjecia/Do rozpatrzenia");
-    dir.mkpath(root + "/Zdjecia/Zaakceptowane");
+    dir.mkpath(root + "/Zdjecia/Usuniete/");
+    dir.mkpath(root + "/Zdjecia/Do rozpatrzenia/");
+    dir.mkpath(root + "/Zdjecia/Zaakceptowane/");
 
 }
 
@@ -267,40 +268,37 @@ void MainWindow::picButtons()
         QPushButton *abortButton = msgBox.addButton(tr("Cofnij zmiany/Anuluj"), QMessageBox::ActionRole);
 
         msgBox.exec();
+
+        picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
+        picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
+        picButton[a]->setPalette(picButton[a]->picPalette);
+        picButton[a]->isGray = true;
+
+/*filePath przechowuje sciezke do folderu, do ktorego zostal skopiowany obrazek, dzieki czemu bedzie mozna pozniej
+cofnac zaznaczenie przyciskiem abortButton*/
+
         if (msgBox.clickedButton() == deleteButton)
         {
-            picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
-            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-            picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Usuniete/"+picButton[a]->fileName) );
+            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Usuniete/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Usuniete/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == forConsiderationButton)
         {
-            picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
-            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-            picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName) );
+            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == acptButton)
         {
-            picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
-            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-            picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName) );
+            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
         }
         else if(msgBox.clickedButton() == abortButton)
         {
             picButton[a]->picBrush.setTexture(picButton[a]->picture);
             picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
             picButton[a]->setPalette(picButton[a]->picPalette);
-            QFile::rename(picButton[a]->filePath, picButton[a]->originalFilePath );
-            picButton[a]->filePath = picButton[a]->originalFilePath;
+            if(picButton[a]->isGray)
+                QFile::remove(picButton[a]->filePath);
             picButton[a]->isGray = false;
 
         }
@@ -359,7 +357,7 @@ void MainWindow::acceptAction()
         {
                 for(unsigned int i=0; i<picsQuantity; ++i)
                 {
-                    if(picButton[i]->isGray)
+                    if(!picButton[i]->isGray)
                     {
                         picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
                         picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
