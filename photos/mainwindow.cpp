@@ -362,7 +362,7 @@ void MainWindow::acceptAction()
                         picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
                         picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
                         picButton[i]->setPalette(picButton[i]->picPalette);
-                        QFile::rename(picButton[i]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName) );
+                        QFile::copy(picButton[i]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName) );
                         picButton[i]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName;
                         picButton[i]->isGray = true;
                     }
