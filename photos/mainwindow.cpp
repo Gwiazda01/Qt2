@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+int const MainWindow::EXIT_CODE_REBOOT = -123456789;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -8,42 +9,40 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    picsQuantity = 0;
     isStarted = false;
 
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
 
-    bool katalog;
+    if(appNotFirstStarted)
+    {
+        QMessageBox fPath;
+        fPath.setWindowTitle("Wybór ścieżki");
+        fPath.setText("Do czego ścieżki będziesz wpisywać?");
+        fPath.setIcon(QMessageBox::Question);
+        QPushButton *catalogButton = fPath.addButton(tr("Katalogi"), QMessageBox::ActionRole);
+        QPushButton *fileButton = fPath.addButton(tr("Pliki"), QMessageBox::ActionRole);
 
-    QMessageBox fPath;
-    fPath.setWindowTitle("Wybór ścieżki");
-    fPath.setText("Do czego ścieżki będziesz wpisywać?");
-    fPath.setIcon(QMessageBox::Question);
-    QPushButton *catalogButton = fPath.addButton(tr("Katalogi"), QMessageBox::ActionRole);
-    QPushButton *fileButton = fPath.addButton(tr("Pliki"), QMessageBox::ActionRole);
+        fPath.exec();
+        if (fPath.clickedButton() == catalogButton)
+            katalog = true;
+        else if (fPath.clickedButton() == fileButton)
+            katalog = false;
 
-    fPath.exec();
-    if (fPath.clickedButton() == catalogButton)
-        katalog = true;
-    else if (fPath.clickedButton() == fileButton)
-        katalog = false;
-
-
-    QString filePath;
     //QFileDialog dialog(this, tr("Ścieżki"), QDir::homePath(), "Text files (*.txt);; Any file (*)");
-    if(katalog)
-        filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do katalogów"),
+        if(katalog)
+            filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do katalogów"),
+                                                            QDir::homePath(),
+                                                            tr("Text files (*.txt);;Any file (*)"));
+        //filePath = dialog.getOpenFileName();
+        else
+            filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do plików"),
                                                         QDir::homePath(),
                                                         tr("Text files (*.txt);;Any file (*)"));
         //filePath = dialog.getOpenFileName();
-    else
-        filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do plików"),
-                                                        QDir::homePath(),
-                                                        tr("Text files (*.txt);;Any file (*)"));
-        //filePath = dialog.getOpenFileName();
-    isStarted = true;
+    }
+        isStarted = true;
     if(!filePath.isEmpty())
     {
         QFile file(filePath);
@@ -94,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
     acceptButton = new QPushButton("Accept photos", this);
+    nextPart = new QPushButton("Next Part", this);
 
     lines->setGeometry(x-200,30,100,20);
     columns->setGeometry(x-320,30,100,20);
@@ -101,11 +101,14 @@ MainWindow::MainWindow(QWidget *parent) :
     nextPage->setGeometry(x-425,30,85,20);
     previousPage->setGeometry(x-510,30,90,20);
     acceptButton->setGeometry(x-630,30,95,20);
+    nextPart->setGeometry(x-800,30,85,20);
+
 
     connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
     connect(nextPage, SIGNAL(released()), this, SLOT(nextButton()));
     connect(previousPage, SIGNAL(released()), this, SLOT(previousButton()));
     connect(acceptButton, SIGNAL(released()), this, SLOT(acceptAction()));
+    connect(nextPart, SIGNAL(released()), this, SLOT(restartAction()));
 
     k=5, w=3;
     createButtons();
@@ -372,4 +375,11 @@ void MainWindow::acceptAction()
         {
             acceptBox.close();
         }
+}
+//**********************************************************************************
+void MainWindow::restartAction()
+{
+    appNotFirstStarted = true;
+    this->close();
+    qApp->exit(MainWindow::EXIT_CODE_REBOOT);
 }
