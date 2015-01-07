@@ -3,9 +3,20 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.showMaximized();
+    int currentExitCode = 0;
+    QApplication *a;
+    MainWindow *w;
+    do
+    {
+        a = new QApplication(argc, argv);
+        w = new MainWindow();
+        w->showMaximized();
+        currentExitCode = a->exec();
+        delete a;
+        delete w;
+    }
+    while( currentExitCode == MainWindow::EXIT_CODE_REBOOT);
 
-    return a.exec();
+    return currentExitCode;
 }
+//*****************************************

@@ -19,12 +19,14 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    static int const EXIT_CODE_REBOOT;
+    static bool appNotFirstStarted, katalog;
 protected:
     void paintEvent(QPaintEvent *);
     void makeGray(QPixmap, int );
 
-    QString abc, root;
-    QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton;
+    QString abc, root, filePath;
+    QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *nextPart;
     std::vector <CustomButton*> picButton;
     unsigned int x,y, picsQuantity, page, k, w, size;
     QLineEdit *columns, *lines;
@@ -37,7 +39,7 @@ public slots:
     void previousButton();
     void resizeBtn();
     void acceptAction();
-
+    void restartAction();
 private:
     Ui::MainWindow *ui;
 };
