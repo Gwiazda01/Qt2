@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "custombutton.h"
+#include "variable.h"
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,16 +21,18 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     static int const EXIT_CODE_REBOOT;
-    static bool appNotFirstStarted, katalog;
+    static bool appFirstStarted, katalog;
+    static QString filePath;
+    static unsigned int absolutePicsQuantity, endPicsDisplay, startPicsDisplay, part, totalParts, picsPerPart, iterator;
 protected:
     void paintEvent(QPaintEvent *);
     void makeGray(QPixmap, int );
 
-    QString abc, root, filePath;
-    QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *nextPart;
+    QString abc, root;
+    QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *changePart;
     std::vector <CustomButton*> picButton;
     unsigned int x,y, picsQuantity, page, k, w, size;
-    QLineEdit *columns, *lines;
+    QLineEdit *columns, *lines, *partEditLine;
     bool isStarted;
 
 public slots:

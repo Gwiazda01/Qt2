@@ -2,6 +2,12 @@
 #include "ui_mainwindow.h"
 
 int const MainWindow::EXIT_CODE_REBOOT = -123456789;
+bool MainWindow::appFirstStarted = true;
+bool MainWindow::katalog;
+QString MainWindow::filePath;
+unsigned int MainWindow::absolutePicsQuantity = 0;
+unsigned int MainWindow::endPicsDisplay, MainWindow::startPicsDisplay, MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
+unsigned int MainWindow::iterator = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -10,12 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     isStarted = false;
+    picsQuantity = 0;
 
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
-
-    if(appNotFirstStarted)
+    if(appFirstStarted)
     {
         QMessageBox fPath;
         fPath.setWindowTitle("Wybór ścieżki");
@@ -45,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
         isStarted = true;
     if(!filePath.isEmpty())
     {
-        QFile file(filePath);
+        QFile file(MainWindow::filePath);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
                 QMessageBox::information(this,
                 "File open error",
@@ -53,6 +59,34 @@ MainWindow::MainWindow(QWidget *parent) :
                 );
         QTextStream in(&file);
         in.setCodec("UTF-8");
+        if(appFirstStarted)
+        {
+            qint64 posBefore = in.pos();
+            while(!in.atEnd())
+            {
+                if(katalog)
+                {
+                    QString line = in.readLine();
+                    QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
+                                                                                        QDir::Files, QDir::Name);
+                    foreach(const QFileInfo &inf, info)
+                        ++absolutePicsQuantity;
+                }
+                else
+                        ++absolutePicsQuantity;
+            }
+            in.seek(posBefore);
+
+            if(absolutePicsQuantity % picsPerPart)
+                totalParts = absolutePicsQuantity/picsPerPart + 1;
+            else
+                totalParts = absolutePicsQuantity;
+            part = 1;
+
+        }
+        endPicsDisplay = part * picsPerPart;
+        startPicsDisplay = endPicsDisplay - picsPerPart;
+
         while(!in.atEnd())
         {
             QString line = in.readLine();
@@ -60,21 +94,32 @@ MainWindow::MainWindow(QWidget *parent) :
             {
                 QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
                                                                                         QDir::Files, QDir::Name);
+                iterator = 0;
                 foreach(const QFileInfo &inf, info)
                 {
-                    picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
-                    picButton[picsQuantity]->fileName = inf.fileName();
-                    picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
                     ++picsQuantity;
+                    if( (picsQuantity - 1 >= startPicsDisplay) && ( picsQuantity-1 < endPicsDisplay) )
+                    {
+                        picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
+                        picButton[iterator]->fileName = inf.fileName();
+                        picButton[iterator]->setObjectName(QString::number(iterator));
+                        ++iterator;
+                    }
+
                 }
             }
             else
             {
                     QFileInfo file(line);
-                    picButton.push_back(new CustomButton(file.absoluteFilePath(), this));
-                    picButton[picsQuantity]->fileName = file.fileName();
-                    picButton[picsQuantity]->setObjectName(QString::number(picsQuantity));
                     ++picsQuantity;
+                    if( (picsQuantity - 1 >= startPicsDisplay) && (picsQuantity - 1 < endPicsDisplay) )
+                    {
+                        picButton.push_back(new CustomButton(file.absoluteFilePath(), this));
+                        picButton[iterator]->fileName = file.fileName();
+                        picButton[iterator]->setObjectName(QString::number(iterator));
+                        ++iterator;
+                    }
+
 
             }
         }
@@ -89,30 +134,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
     columns = new QLineEdit(this);
     lines = new QLineEdit(this);
+    partEditLine = new QLineEdit(this);
     resizeButton = new QPushButton("Resize",this);
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
     acceptButton = new QPushButton("Accept photos", this);
-    nextPart = new QPushButton("Next Part", this);
+    changePart = new QPushButton("Go", this);
 
     lines->setGeometry(x-200,30,100,20);
     columns->setGeometry(x-320,30,100,20);
+    partEditLine->setGeometry(x-855,30,50,20);
     resizeButton->setGeometry(x-95,30,50,20);
     nextPage->setGeometry(x-425,30,85,20);
     previousPage->setGeometry(x-510,30,90,20);
     acceptButton->setGeometry(x-630,30,95,20);
-    nextPart->setGeometry(x-800,30,85,20);
+    changePart->setGeometry(x-800,30,50,20);
 
 
     connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
     connect(nextPage, SIGNAL(released()), this, SLOT(nextButton()));
     connect(previousPage, SIGNAL(released()), this, SLOT(previousButton()));
     connect(acceptButton, SIGNAL(released()), this, SLOT(acceptAction()));
-    connect(nextPart, SIGNAL(released()), this, SLOT(restartAction()));
+    connect(changePart, SIGNAL(released()), this, SLOT(restartAction()));
 
     k=5, w=3;
     createButtons();
-    for(unsigned int i=0; i<picsQuantity; ++i)
+    for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
 
 
@@ -128,23 +175,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    for(unsigned int i=0; i<picsQuantity; ++i)
+    for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
     {
         delete picButton[i];
 
     }
     delete resizeButton;
+    delete changePart;
+    delete partEditLine;
     delete columns;
     delete lines;
+    delete nextPage;
+    delete previousPage;
     delete ui;
 }
 //***************************************************************
 void MainWindow::createButtons()
 {
-    if(picsQuantity%(k*w))
-            size = picsQuantity/(k*w) + 1;
+    if(picsPerPart%(k*w))
+            size = picsPerPart/(k*w) + 1;
         else
-            size = picsQuantity/(k*w);
+            size = picsPerPart/(k*w);
 
     if(page!=1)
         previousPage->setEnabled(true);
@@ -168,7 +219,7 @@ void MainWindow::createButtons()
     }
     else
     {
-        for(unsigned int i=page*(unsigned int)k*w ; i<picsQuantity; ++i)
+        for(unsigned int i=page*(unsigned int)k*w ; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
         {
             picButton[i]->setGeometry(0,0,0,0);
         }
@@ -198,7 +249,7 @@ void MainWindow::createButtons()
             picY = picY - moreSpace/w;
             gapY=50;
         }
-        for(unsigned int i=0; i<picsQuantity; ++i)
+        for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
         {
             picButton[i]->picture = picButton[i]->originalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
             makeGray(picButton[i]->picture, i);
@@ -215,11 +266,11 @@ void MainWindow::createButtons()
             for(unsigned int i=0 ; i<(unsigned int)k; ++i)
             {
                 index = i+(unsigned int)k*j+ (page-1)*k*w;
-                if(index>=picsQuantity)
+                if(index>=picsPerPart || ((part-1)*picsPerPart + index>=absolutePicsQuantity))
                     break;
                 picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
             }
-            if(index>=picsQuantity)
+            if(index>=picsPerPart || ((part-1)*picsPerPart + index>=absolutePicsQuantity))
                 break;
         }
     }
@@ -312,11 +363,14 @@ void MainWindow::paintEvent(QPaintEvent *)
     QPainter painter(this);
     if(isStarted)
     {
+
         painter.setFont(QFont("Arial", 14));
         painter.drawText(x-216,46, "X");
         painter.setFont(QFont("Times", 10));
         painter.drawText(x-315,28, "Columns:");
         painter.drawText(x-195,28, "Lines:");
+        painter.setFont(QFont("Times", 11));
+        painter.drawText(x-940,44,"Choose part:");
     }
 }
 //*********************************************************************
@@ -358,7 +412,7 @@ void MainWindow::acceptAction()
         acceptBox.exec();
         if(acceptBox.clickedButton() == YesButton)
         {
-                for(unsigned int i=0; i<picsQuantity; ++i)
+                for(unsigned int i=0; i<picsPerPart; ++i)
                 {
                     if(!picButton[i]->isGray)
                     {
@@ -379,7 +433,17 @@ void MainWindow::acceptAction()
 //**********************************************************************************
 void MainWindow::restartAction()
 {
-    appNotFirstStarted = true;
-    this->close();
-    qApp->exit(MainWindow::EXIT_CODE_REBOOT);
+    MainWindow::appFirstStarted = false;
+    if(!partEditLine->text().isEmpty() && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
+    {
+        this->close();
+        qApp->exit(MainWindow::EXIT_CODE_REBOOT);
+        delete this;
+        part = partEditLine->text().toInt();
+    }
+    else
+       QMessageBox::information(this,
+           "Error",
+           "Poza zakresem!"
+           );
 }

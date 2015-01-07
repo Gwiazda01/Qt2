@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         w->showMaximized();
         currentExitCode = a->exec();
         delete a;
-        delete w;
+        //delete w;
     }
     while( currentExitCode == MainWindow::EXIT_CODE_REBOOT);
 
