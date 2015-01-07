@@ -6,8 +6,8 @@ bool MainWindow::appFirstStarted = true;
 bool MainWindow::katalog;
 QString MainWindow::filePath;
 unsigned int MainWindow::absolutePicsQuantity = 0;
-unsigned int MainWindow::endPicsDisplay, MainWindow::startPicsDisplay, MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
-unsigned int MainWindow::iterator = 0;
+unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
+//unsigned int MainWindow::iterator = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -90,11 +90,11 @@ MainWindow::MainWindow(QWidget *parent) :
         while(!in.atEnd())
         {
             QString line = in.readLine();
+            int iterator = 0;
             if(katalog)
             {
                 QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
                                                                                         QDir::Files, QDir::Name);
-                iterator = 0;
                 foreach(const QFileInfo &inf, info)
                 {
                     ++picsQuantity;
@@ -326,7 +326,6 @@ void MainWindow::picButtons()
         picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
         picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
         picButton[a]->setPalette(picButton[a]->picPalette);
-        picButton[a]->isGray = true;
 
 /*filePath przechowuje sciezke do folderu, do ktorego zostal skopiowany obrazek, dzieki czemu bedzie mozna pozniej
 cofnac zaznaczenie przyciskiem abortButton*/
@@ -335,16 +334,19 @@ cofnac zaznaczenie przyciskiem abortButton*/
         {
             QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Usuniete/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Usuniete/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == forConsiderationButton)
         {
             QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
         }
         else if (msgBox.clickedButton() == acptButton)
         {
             QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName) );
             picButton[a]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName;
+            picButton[a]->isGray = true;
         }
         else if(msgBox.clickedButton() == abortButton)
         {

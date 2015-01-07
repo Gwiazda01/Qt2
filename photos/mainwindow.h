@@ -23,7 +23,7 @@ public:
     static int const EXIT_CODE_REBOOT;
     static bool appFirstStarted, katalog;
     static QString filePath;
-    static unsigned int absolutePicsQuantity, endPicsDisplay, startPicsDisplay, part, totalParts, picsPerPart, iterator;
+    static unsigned int absolutePicsQuantity, part, totalParts, picsPerPart;
 protected:
     void paintEvent(QPaintEvent *);
     void makeGray(QPixmap, int );
@@ -31,7 +31,7 @@ protected:
     QString abc, root;
     QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *changePart;
     std::vector <CustomButton*> picButton;
-    unsigned int x,y, picsQuantity, page, k, w, size;
+    unsigned int x,y, picsQuantity, page, k, w, size, startPicsDisplay, endPicsDisplay;
     QLineEdit *columns, *lines, *partEditLine;
     bool isStarted;
 
