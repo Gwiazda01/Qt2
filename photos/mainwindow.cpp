@@ -158,8 +158,21 @@ void MainWindow::paintEvent(QPaintEvent *)
 //*********************************************************************
 void MainWindow::lineEdit()
 {
-    int k = columns->text().toInt();
-    int l = lines->text().toInt();
-    createButtons(k, l);
-    update();
+
+        int k = columns->text().toInt();
+        int l = lines->text().toInt();
+        if(k<0 || l<0)
+        {
+            QMessageBox box(this);
+            box.setWindowTitle("Error!");
+            box.setText("Wrong numbers... Try again ;)");
+            box.setStandardButtons(QMessageBox::Ok);
+            //box.setWindowFlags(Qt::WindowStaysOnBottomHint);
+            box.setVisible(true);
+        }
+        else
+        {
+            createButtons(k, l);
+            update();
+        }
 }
