@@ -477,7 +477,7 @@ void MainWindow::restartAction()
 //*****************************************************************************************
 void MainWindow::changePicsPerPartAction()
 {
-   if(!picsPerPartEditLine->text().isEmpty()&& picsPerPartEditLine->text().toInt()>0)
+   if(!picsPerPartEditLine->text().isEmpty()&& picsPerPartEditLine->text().toInt()>0 && picsPerPartEditLine->text().toInt() <= 1000)
    {
        MainWindow::appFirstStarted = false;
        this->close();
@@ -486,4 +486,9 @@ void MainWindow::changePicsPerPartAction()
        part = 1;
        picsPerPart = picsPerPartEditLine->text().toInt();
    }
+   else
+      QMessageBox::information(this,
+          "Error",
+          "Poza zakresem!"
+          );
 }
