@@ -10,8 +10,9 @@ CustomButton::CustomButton()
 
 CustomButton::CustomButton(QString a, QWidget * parent = 0): QPushButton(parent)
 {    
-    orginalPicture.load(a);
+    originalPicture.load(a);
     isGray = false;
+    filePath = a;
 
     this->setFlat(true);
     this->setAutoFillBackground(true);
