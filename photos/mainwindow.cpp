@@ -1,12 +1,19 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+<<<<<<< HEAD
+=======
 int const MainWindow::EXIT_CODE_REBOOT = -123456789;
 bool MainWindow::appFirstStarted = true;
 bool MainWindow::katalog;
 QString MainWindow::filePath;
 unsigned int MainWindow::absolutePicsQuantity = 0;
+<<<<<<< HEAD
 unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10, MainWindow::newPart = 0;
+=======
+unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,12 +21,34 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    isStarted = false;
+    columns = new QLineEdit(this);
+    lines = new QLineEdit(this);
     picsQuantity = 0;
-
+    for(unsigned int i=0; i<21; ++i)
+    {        
+        abc = ":pics/car";
+        abc.append(QString::number(i));
+        abc.append(".jpeg");
+        picButton[i] = new CustomButton(abc, this);
+        picButton[i]->setObjectName(QString::number(i));
+        ++picsQuantity;
+    }
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
+<<<<<<< HEAD
+    lines->setGeometry(x-200,20,100,30);
+    columns->setGeometry(x-320,20,100,30);
+    lines->setText("Type lines");
+    columns->setText("Type columns");
+    resizeButton = new QPushButton("Resize",this);
+    resizeButton->setGeometry(x-95,20,50,30);
+    connect(resizeButton, SIGNAL(released()), this, SLOT(lineEdit()));
+    createButtons(5,3);
+
+    for(unsigned int i=0; i<picsQuantity; ++i)
+        connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
+=======
     if(appFirstStarted)
     {
         QMessageBox fPath;
@@ -76,12 +105,14 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             in.seek(posBefore);
             part = 1;
-
         }
 
+<<<<<<< HEAD
         if(newPart>0)
             part = newPart;
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
         if(absolutePicsQuantity % picsPerPart)
             totalParts = absolutePicsQuantity/picsPerPart + 1;
         else
@@ -89,7 +120,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
         endPicsDisplay = part * picsPerPart;
         startPicsDisplay = endPicsDisplay - picsPerPart;
-
         while(!in.atEnd())
         {
             QString line = in.readLine();
@@ -139,7 +169,10 @@ MainWindow::MainWindow(QWidget *parent) :
     lines = new QLineEdit(this);
     partEditLine = new QLineEdit(this);
     picsPerPartEditLine = new QLineEdit(this);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     resizeButton = new QPushButton("Resize",this);
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
@@ -178,23 +211,38 @@ MainWindow::MainWindow(QWidget *parent) :
     dir.mkpath(root + "/Zdjecia/Do rozpatrzenia/");
     dir.mkpath(root + "/Zdjecia/Zaakceptowane/");
 
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
 }
 
 
 
 MainWindow::~MainWindow()
 {
-    for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
+    for(unsigned int i=0; i<picsQuantity; ++i)
     {
         delete picButton[i];
 
     }
     delete acceptButton;
     delete resizeButton;
+<<<<<<< HEAD
+    delete ui;
+}
+//***************************************************************
+void MainWindow::createButtons(unsigned int k, unsigned int w)
+{
+    if(k<=0) k=1;
+    if(w<=0) w=1;
+    for(unsigned int i=k*w ; i<picsQuantity; ++i)
+=======
     delete changePart;
+    delete changePicsPerPart;
     delete partEditLine;
     delete picsPerPartEditLine;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     delete columns;
     delete lines;
     delete nextPage;
@@ -202,9 +250,10 @@ MainWindow::~MainWindow()
     delete changePicsPerPart;
     delete ui;
 }
-//***************************************************************
+//*************************************************************************************************
 void MainWindow::createButtons()
 {
+<<<<<<< HEAD
     if( absolutePicsQuantity < part * picsPerPart )
     {
         if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
@@ -222,6 +271,26 @@ void MainWindow::createButtons()
         else
             size = picsPerPart/(k*w);
     }
+=======
+
+        if( absolutePicsQuantity < part * picsPerPart )
+        {
+            if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w) + 1;
+            else if((absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w);
+            else
+                size = 1;
+
+        }
+        else
+        {
+            if(picsPerPart%(k*w))
+                size = picsPerPart/(k*w) + 1;
+            else
+                size = picsPerPart/(k*w);
+        }
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
     if(page!=1)
         previousPage->setEnabled(true);
@@ -237,70 +306,49 @@ void MainWindow::createButtons()
 
 
     if(k<=0 || w<=0 || k>10 || w>10)
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
     {
-        QMessageBox::information(this,
-           "File input error",
-           "Bledne dane wprowadzone do funkcji CreateButtons\nDane wejsciowe musza zmiescic sie w zakresie (1; 10)"
-           );
+        picButton[i]->setGeometry(0,0,0,0);
     }
-    else
+    unsigned int index;
+    int picX;
+    int picY;
+    float scale;
+    if(k>w) scale = (float)5/(float)k;
+    else scale = (float)5/(float)w;
+    picX = (float)200*scale;
+    picY = (float)150*scale;
+    int gapX = (x-(k*picX))/(k+1);
+    int gapY = (y-(w*picY))/(w+1);
+    if(gapX<50)
     {
-        for(unsigned int i=page*(unsigned int)k*w ; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
-        {
-            picButton[i]->setGeometry(0,0,0,0);
-        }
-        for(unsigned int i=0 ; i<( (page-1)*k*w); ++i)
-        {
-            picButton[i]->setGeometry(0,0,0,0);
-        }
-        unsigned int index;
-        int picX;
-        int picY;
-        float scale;
-        if(k>w) scale = (float)5/(float)k;
-        else scale = (float)5/(float)w;
-        picX = (float)200*scale;
-        picY = (float)150*scale;
-        int gapX = (x-(k*picX))/(k+1);
-        int gapY = (y-(w*picY))/(w+1);
-        if(gapX<50)
-        {
-            int moreSpace =(50-gapX)*(k+1);
-            picX = picX - moreSpace/k;
-            gapX=50;
-        }
-        if(gapY<50)
-        {
-            int moreSpace = (50-gapY)*(w+1);
-            picY = picY - moreSpace/w;
-            gapY=50;
-        }
-        for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
-        {
-            picButton[i]->picture = picButton[i]->originalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
-            makeGray(picButton[i]->picture, i);
-            if(!picButton[i]->isGray)
-                picButton[i]->picBrush.setTexture(picButton[i]->picture);
-            else
-                picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
-            picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
-            picButton[i]->setPalette(picButton[i]->picPalette);
-        }
+        int moreSpace =(50-gapX)*(k+1);
+        picX = picX - moreSpace/k;
+        gapX=50;
+    }
+    if(gapY<50)
+    {
+        int moreSpace = (50-gapY)*(w+1);
+        picY = picY - moreSpace/w;
+        gapY=50;
+    }
+    for(unsigned int i=0; i<picsQuantity; ++i)
+    {
+        picButton[i]->picture = picButton[i]->orginalPicture.scaled(picX,picY,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+        makeGray(picButton[i]->picture, i);
+        picButton[i]->picBrush.setTexture(picButton[i]->picture);
+        picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
+        picButton[i]->setPalette(picButton[i]->picPalette);
+    }
 
-        for(unsigned int j=0; j<(unsigned int)w; ++j)
+    for(unsigned int j=0; j<w; ++j)
+        for(unsigned int i=0 ; i<k; ++i)
         {
-            for(unsigned int i=0 ; i<(unsigned int)k; ++i)
-            {
-                index = i+(unsigned int)k*j+ (page-1)*k*w;
-                if(index>=picsPerPart || ((part-1)*picsPerPart + index>=absolutePicsQuantity))
-                    break;
-                picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
-            }
-            if(index>=picsPerPart || ((part-1)*picsPerPart + index>=absolutePicsQuantity))
+            index = i+k*j;
+            if(index>=picsQuantity)
                 break;
+            picButton[index]->setGeometry((gapX+i*(picX+gapX)),(gapY+j*(picY+gapY)),picX,picY);
         }
-    }
-    update();
 }
 
 //****************************************************************
@@ -336,62 +384,23 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
 }
 //******************************************************************
 void MainWindow::picButtons()
-{    
-        int a = sender()->objectName().toInt();
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Przeniesienie zdjęcia");
-        msgBox.setText("Do jakiego folderu przeniesc zdjecie?");
-        msgBox.setIcon(QMessageBox::Question);
-        QPushButton *deleteButton = msgBox.addButton(tr("Usuniete"), QMessageBox::ActionRole);
-        QPushButton *forConsiderationButton = msgBox.addButton(tr("Do rozpatrzenia"), QMessageBox::ActionRole);
-        QPushButton *acptButton = msgBox.addButton(tr("Zaakceptowane"), QMessageBox::ActionRole);
-        QPushButton *abortButton = msgBox.addButton(tr("Cofnij zmiany/Anuluj"), QMessageBox::ActionRole);
-
-        msgBox.exec();
-
-        picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
-        picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-        picButton[a]->setPalette(picButton[a]->picPalette);
-
-/*filePath przechowuje sciezke do folderu, do ktorego zostal skopiowany obrazek, dzieki czemu bedzie mozna pozniej
-cofnac zaznaczenie przyciskiem abortButton*/
-
-        if (msgBox.clickedButton() == deleteButton)
-        {
-            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Usuniete/"+picButton[a]->fileName) );
-            picButton[a]->filePath = root + "/Zdjecia/Usuniete/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
-        }
-        else if (msgBox.clickedButton() == forConsiderationButton)
-        {
-            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName) );
-            picButton[a]->filePath = root + "/Zdjecia/Do rozpatrzenia/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
-        }
-        else if (msgBox.clickedButton() == acptButton)
-        {
-            QFile::copy(picButton[a]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName) );
-            picButton[a]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[a]->fileName;
-            picButton[a]->isGray = true;
-        }
-        else if(msgBox.clickedButton() == abortButton)
-        {
-            picButton[a]->picBrush.setTexture(picButton[a]->picture);
-            picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
-            picButton[a]->setPalette(picButton[a]->picPalette);
-            if(picButton[a]->isGray)
-                QFile::remove(picButton[a]->filePath);
-            picButton[a]->isGray = false;
-
-        }
-}
-//********************************************************************
-void MainWindow::paintEvent(QPaintEvent *)
 {
-    QPainter painter(this);
-    if(isStarted)
+    int a = sender()->objectName().toInt();
+    if(!picButton[a]->isGray)
     {
-
+<<<<<<< HEAD
+    picButton[a]->picBrush.setTexture(picButton[a]->grayPicture);
+    picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
+    picButton[a]->setPalette(picButton[a]->picPalette);
+    picButton[a]->isGray=true;
+    }
+    else
+    {
+    picButton[a]->picBrush.setTexture(picButton[a]->picture);
+    picButton[a]->picPalette.setBrush(QPalette::Button,picButton[a]->picBrush);
+    picButton[a]->setPalette(picButton[a]->picPalette);
+    picButton[a]->isGray=false;
+=======
         painter.setFont(QFont("Arial", 14));
         painter.drawText(x-216,46, "X");
         painter.setFont(QFont("Times", 10));
@@ -402,69 +411,48 @@ void MainWindow::paintEvent(QPaintEvent *)
         painter.drawText(335, 44, "Part: "+QString::number(part)+"/"+QString::number(totalParts));
         painter.drawText(50,32,"Pictures per part:");
         painter.drawText(75,48, QString::number(picsPerPart) + "/" + QString::number(absolutePicsQuantity));
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     }
 }
-//*********************************************************************
-void MainWindow::nextButton()
-{
-        if(page!=size)
-            ++page;
-
-    createButtons();
-}
-//*********************************************************************
-void MainWindow::previousButton()
-{
-    if(page!=1)
-        --page;
-
-    createButtons();
-}
 //********************************************************************
-void MainWindow::resizeBtn()
+void MainWindow::paintEvent(QPaintEvent *)
 {
-    page = 1;
-    if(!columns->text().isEmpty())
-        k = columns->text().toInt();
+    QPainter painter(this);
+    painter.setFont(QFont("Arial", 20));
+    painter.drawText(x-219,45, "X");
+}
+//*********************************************************************
+void MainWindow::lineEdit()
+{
 
-    if(!lines->text().isEmpty())
-        w = lines->text().toInt();
-    createButtons();
-}
-//****************************************************************************
-void MainWindow::acceptAction()
-{
-        QMessageBox acceptBox;
-        acceptBox.setWindowTitle("Akceptacja zdjęć?");
-        acceptBox.setText("Czy przenieść niezaznaczone zdjęcia do folderu \"Zaakceptowane\"?");
-        acceptBox.setIcon(QMessageBox::Question);
-        QPushButton *YesButton = acceptBox.addButton(tr("Tak"), QMessageBox::ActionRole);
-        QPushButton *NoButton = acceptBox.addButton(tr("Nie"), QMessageBox::ActionRole);
-        acceptBox.exec();
-        if(acceptBox.clickedButton() == YesButton)
+        int k = columns->text().toInt();
+        int l = lines->text().toInt();
+        if(k<0 || l<0)
         {
-                for(unsigned int i=0; i<picsPerPart; ++i)
-                {
-                    if(!picButton[i]->isGray)
-                    {
-                        picButton[i]->picBrush.setTexture(picButton[i]->grayPicture);
-                        picButton[i]->picPalette.setBrush(QPalette::Button,picButton[i]->picBrush);
-                        picButton[i]->setPalette(picButton[i]->picPalette);
-                        QFile::copy(picButton[i]->filePath, (root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName) );
-                        picButton[i]->filePath = root + "/Zdjecia/Zaakceptowane/"+picButton[i]->fileName;
-                        picButton[i]->isGray = true;
-                    }
-                }
+            QMessageBox box(this);
+            box.setWindowTitle("Error!");
+            box.setText("Wrong numbers... Try again ;)");
+            box.setStandardButtons(QMessageBox::Ok);
+            //box.setWindowFlags(Qt::WindowStaysOnBottomHint);
+            box.setVisible(true);
         }
-        else if(acceptBox.clickedButton() == NoButton)
+        else
         {
-            acceptBox.close();
+            createButtons(k, l);
+            update();
         }
 }
+<<<<<<< HEAD
+=======
 //**********************************************************************************
 void MainWindow::restartAction()
 {
     MainWindow::appFirstStarted = false;
+<<<<<<< HEAD
 
     if(!partEditLine->text().isEmpty() && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
     {
@@ -475,6 +463,17 @@ void MainWindow::restartAction()
         wnd = new MainWindow();
         wnd->showMaximized();
         //qApp->exit(MainWindow::EXIT_CODE_REBOOT);
+=======
+    if((!partEditLine->text().isEmpty() || !picsPerPartEditLine->text().isEmpty()) && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
+    {
+        if((unsigned)partEditLine->text().toInt()!=part)
+        {
+            this->close();
+            qApp->exit(MainWindow::EXIT_CODE_REBOOT);
+            delete this;
+            part = partEditLine->text().toInt();
+        }
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     }
     else
        QMessageBox::information(this,
@@ -489,12 +488,19 @@ void MainWindow::changePicsPerPartAction()
    {
        MainWindow::appFirstStarted = false;
        this->close();
+<<<<<<< HEAD
        delete this;
        newPart = 1;
        picsPerPart = picsPerPartEditLine->text().toInt();
        MainWindow *wnd;
        wnd = new MainWindow();
        wnd->showMaximized();
+=======
+       qApp->exit(MainWindow::EXIT_CODE_REBOOT);
+       delete this;
+       part = 1;
+       picsPerPart = picsPerPartEditLine->text().toInt();
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
    }
    else
       QMessageBox::information(this,
@@ -502,3 +508,7 @@ void MainWindow::changePicsPerPartAction()
           "Poza zakresem!"
           );
 }
+<<<<<<< HEAD
+=======
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628

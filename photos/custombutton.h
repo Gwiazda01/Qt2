@@ -9,8 +9,7 @@ class CustomButton : public QPushButton
 {
     Q_OBJECT
 public:
-    QString filePath, fileName, originalFilePath;
-    QPixmap originalPicture, picture, grayPicture;
+    QPixmap orginalPicture, picture, grayPicture;
     QBrush picBrush;
     QPalette picPalette;
     bool isGray;

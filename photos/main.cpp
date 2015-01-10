@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
+<<<<<<< HEAD
     int currentExitCode = 0;
 
     MainWindow *w;
@@ -12,7 +13,11 @@ int main(int argc, char *argv[])
         w->showMaximized();
         a.exec();
     //while( currentExitCode == MainWindow::EXIT_CODE_REBOOT);
+=======
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.showMaximized();
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
-    return currentExitCode;
+    return a.exec();
 }
-//*****************************************

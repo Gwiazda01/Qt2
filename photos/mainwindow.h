@@ -2,9 +2,12 @@
 #define MAINWINDOW_H
 
 #include "custombutton.h"
+<<<<<<< HEAD
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
 namespace Ui {
 
@@ -19,13 +22,28 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+<<<<<<< HEAD
     static int const EXIT_CODE_REBOOT;
     static bool appFirstStarted, katalog;
     static QString filePath;
     static unsigned int absolutePicsQuantity, part, totalParts, picsPerPart, newPart;
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 protected:
     void paintEvent(QPaintEvent *);
+    void createButtons(unsigned int, unsigned int);
     void makeGray(QPixmap, int );
+<<<<<<< HEAD
+    QString abc;
+    QPushButton *resizeButton;
+    CustomButton *picButton[21];
+    unsigned int x,y, picsQuantity;
+    QLineEdit *columns, *lines;
+public slots:
+    void picButtons();
+    void lineEdit();
+
+=======
 
     QString abc, root;
     QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *changePart, *changePicsPerPart;
@@ -43,6 +61,10 @@ public slots:
     void acceptAction();
     void restartAction();
     void changePicsPerPartAction();
+<<<<<<< HEAD
+=======
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 private:
     Ui::MainWindow *ui;
 };
