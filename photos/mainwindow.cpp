@@ -13,6 +13,9 @@ unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart =
 =======
 unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
 >>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+<<<<<<< HEAD
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
+=======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -108,9 +111,12 @@ MainWindow::MainWindow(QWidget *parent) :
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if(newPart>0)
             part = newPart;
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
         if(absolutePicsQuantity % picsPerPart)
@@ -170,7 +176,10 @@ MainWindow::MainWindow(QWidget *parent) :
     partEditLine = new QLineEdit(this);
     picsPerPartEditLine = new QLineEdit(this);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     resizeButton = new QPushButton("Resize",this);
@@ -240,7 +249,10 @@ void MainWindow::createButtons(unsigned int k, unsigned int w)
     delete partEditLine;
     delete picsPerPartEditLine;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     delete columns;
@@ -253,6 +265,7 @@ void MainWindow::createButtons(unsigned int k, unsigned int w)
 //*************************************************************************************************
 void MainWindow::createButtons()
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
     if( absolutePicsQuantity < part * picsPerPart )
     {
@@ -284,12 +297,29 @@ void MainWindow::createButtons()
 
         }
         else
+=======
+
+        if( absolutePicsQuantity < part * picsPerPart )
+        {
+            if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w) + 1;
+            else if((absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w);
+            else
+                size = 1;
+
+        }
+        else
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
         {
             if(picsPerPart%(k*w))
                 size = picsPerPart/(k*w) + 1;
             else
                 size = picsPerPart/(k*w);
         }
+<<<<<<< HEAD
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
+=======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
     if(page!=1)
@@ -412,6 +442,11 @@ void MainWindow::picButtons()
         painter.drawText(50,32,"Pictures per part:");
         painter.drawText(75,48, QString::number(picsPerPart) + "/" + QString::number(absolutePicsQuantity));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 
 >>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
@@ -453,6 +488,7 @@ void MainWindow::restartAction()
 {
     MainWindow::appFirstStarted = false;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     if(!partEditLine->text().isEmpty() && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
     {
@@ -466,6 +502,10 @@ void MainWindow::restartAction()
 =======
     if((!partEditLine->text().isEmpty() || !picsPerPartEditLine->text().isEmpty()) && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
     {
+=======
+    if((!partEditLine->text().isEmpty() || !picsPerPartEditLine->text().isEmpty()) && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
+    {
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
         if((unsigned)partEditLine->text().toInt()!=part)
         {
             this->close();
@@ -473,6 +513,9 @@ void MainWindow::restartAction()
             delete this;
             part = partEditLine->text().toInt();
         }
+<<<<<<< HEAD
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
+=======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
     }
     else
@@ -489,6 +532,7 @@ void MainWindow::changePicsPerPartAction()
        MainWindow::appFirstStarted = false;
        this->close();
 <<<<<<< HEAD
+<<<<<<< HEAD
        delete this;
        newPart = 1;
        picsPerPart = picsPerPartEditLine->text().toInt();
@@ -496,10 +540,15 @@ void MainWindow::changePicsPerPartAction()
        wnd = new MainWindow();
        wnd->showMaximized();
 =======
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
        qApp->exit(MainWindow::EXIT_CODE_REBOOT);
        delete this;
        part = 1;
        picsPerPart = picsPerPartEditLine->text().toInt();
+<<<<<<< HEAD
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
+=======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
    }
    else
@@ -509,6 +558,10 @@ void MainWindow::changePicsPerPartAction()
           );
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628

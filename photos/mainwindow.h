@@ -3,9 +3,12 @@
 
 #include "custombutton.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 
@@ -23,10 +26,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 <<<<<<< HEAD
+<<<<<<< HEAD
     static int const EXIT_CODE_REBOOT;
     static bool appFirstStarted, katalog;
     static QString filePath;
     static unsigned int absolutePicsQuantity, part, totalParts, picsPerPart, newPart;
+=======
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 protected:
@@ -62,6 +68,10 @@ public slots:
     void restartAction();
     void changePicsPerPartAction();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
+>>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
 =======
 >>>>>>> 3d5f9023ee077e77f3f392262345152719041c72
 >>>>>>> 0560799f253d376cd92e8ef30b12ffaafd2b7628
