@@ -6,8 +6,7 @@ bool MainWindow::appFirstStarted = true;
 bool MainWindow::katalog;
 QString MainWindow::filePath;
 unsigned int MainWindow::absolutePicsQuantity = 0;
-unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
-//unsigned int MainWindow::iterator = 0;
+unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10, MainWindow::newPart = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -76,14 +75,18 @@ MainWindow::MainWindow(QWidget *parent) :
                         ++absolutePicsQuantity;
             }
             in.seek(posBefore);
-
-            if(absolutePicsQuantity % picsPerPart)
-                totalParts = absolutePicsQuantity/picsPerPart + 1;
-            else
-                totalParts = absolutePicsQuantity;
             part = 1;
 
         }
+
+        if(newPart>0)
+            part = newPart;
+
+        if(absolutePicsQuantity % picsPerPart)
+            totalParts = absolutePicsQuantity/picsPerPart + 1;
+        else
+            totalParts = absolutePicsQuantity;
+
         endPicsDisplay = part * picsPerPart;
         startPicsDisplay = endPicsDisplay - picsPerPart;
 
@@ -135,20 +138,26 @@ MainWindow::MainWindow(QWidget *parent) :
     columns = new QLineEdit(this);
     lines = new QLineEdit(this);
     partEditLine = new QLineEdit(this);
+    picsPerPartEditLine = new QLineEdit(this);
+
     resizeButton = new QPushButton("Resize",this);
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
     acceptButton = new QPushButton("Accept photos", this);
     changePart = new QPushButton("Go", this);
+    changePicsPerPart = new QPushButton("Change", this);
 
     lines->setGeometry(x-200,30,100,20);
     columns->setGeometry(x-320,30,100,20);
     partEditLine->setGeometry(x-855,30,50,20);
+    picsPerPartEditLine->setGeometry(175,30,50,20);
+
     resizeButton->setGeometry(x-95,30,50,20);
     nextPage->setGeometry(x-425,30,85,20);
     previousPage->setGeometry(x-510,30,90,20);
     acceptButton->setGeometry(x-630,30,95,20);
     changePart->setGeometry(x-800,30,50,20);
+    changePicsPerPart->setGeometry(230,30,50,20);
 
 
     connect(resizeButton, SIGNAL(released()), this, SLOT(resizeBtn()));
@@ -156,12 +165,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(previousPage, SIGNAL(released()), this, SLOT(previousButton()));
     connect(acceptButton, SIGNAL(released()), this, SLOT(acceptAction()));
     connect(changePart, SIGNAL(released()), this, SLOT(restartAction()));
+    connect(changePicsPerPart, SIGNAL(released()), this, SLOT(changePicsPerPartAction()));
 
     k=5, w=3;
     createButtons();
     for(unsigned int i=0; i<picsPerPart && ((part-1)*picsPerPart + i < absolutePicsQuantity); ++i)
         connect(picButton[i], SIGNAL(released()), this, SLOT(picButtons()));
-
 
     QDir dir = QDir::home();
     root = dir.absolutePath();
@@ -180,22 +189,39 @@ MainWindow::~MainWindow()
         delete picButton[i];
 
     }
+    delete acceptButton;
     delete resizeButton;
     delete changePart;
     delete partEditLine;
+    delete picsPerPartEditLine;
+
     delete columns;
     delete lines;
     delete nextPage;
     delete previousPage;
+    delete changePicsPerPart;
     delete ui;
 }
 //***************************************************************
 void MainWindow::createButtons()
 {
-    if(picsPerPart%(k*w))
+    if( absolutePicsQuantity < part * picsPerPart )
+    {
+        if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+            size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w) + 1;
+        else if((absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+            size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w);
+        else
+            size = 1;
+
+    }
+    else
+    {
+        if(picsPerPart%(k*w))
             size = picsPerPart/(k*w) + 1;
         else
             size = picsPerPart/(k*w);
+    }
 
     if(page!=1)
         previousPage->setEnabled(true);
@@ -373,6 +399,9 @@ void MainWindow::paintEvent(QPaintEvent *)
         painter.drawText(x-195,28, "Lines:");
         painter.setFont(QFont("Times", 11));
         painter.drawText(x-940,44,"Choose part:");
+        painter.drawText(335, 44, "Part: "+QString::number(part)+"/"+QString::number(totalParts));
+        painter.drawText(50,32,"Pictures per part:");
+        painter.drawText(75,48, QString::number(picsPerPart) + "/" + QString::number(absolutePicsQuantity));
     }
 }
 //*********************************************************************
@@ -436,16 +465,40 @@ void MainWindow::acceptAction()
 void MainWindow::restartAction()
 {
     MainWindow::appFirstStarted = false;
+
     if(!partEditLine->text().isEmpty() && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
     {
+        newPart = partEditLine->text().toInt();
         this->close();
-        qApp->exit(MainWindow::EXIT_CODE_REBOOT);
         delete this;
-        part = partEditLine->text().toInt();
+        MainWindow *wnd;
+        wnd = new MainWindow();
+        wnd->showMaximized();
+        //qApp->exit(MainWindow::EXIT_CODE_REBOOT);
     }
     else
        QMessageBox::information(this,
            "Error",
            "Poza zakresem!"
            );
+}
+//*****************************************************************************************
+void MainWindow::changePicsPerPartAction()
+{
+   if(!picsPerPartEditLine->text().isEmpty()&& picsPerPartEditLine->text().toInt()>0 && picsPerPartEditLine->text().toInt() <= 1000)
+   {
+       MainWindow::appFirstStarted = false;
+       this->close();
+       delete this;
+       newPart = 1;
+       picsPerPart = picsPerPartEditLine->text().toInt();
+       MainWindow *wnd;
+       wnd = new MainWindow();
+       wnd->showMaximized();
+   }
+   else
+      QMessageBox::information(this,
+          "Error",
+          "Poza zakresem!"
+          );
 }
