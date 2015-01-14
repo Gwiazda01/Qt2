@@ -6,7 +6,7 @@ bool MainWindow::appFirstStarted = true;
 bool MainWindow::katalog;
 QString MainWindow::filePath;
 unsigned int MainWindow::absolutePicsQuantity = 0;
-unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10;
+unsigned int MainWindow::part, MainWindow::totalParts, MainWindow::picsPerPart = 10, MainWindow::newPart = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -76,7 +76,11 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             in.seek(posBefore);
             part = 1;
+
         }
+
+        if(newPart>0)
+            part = newPart;
 
         if(absolutePicsQuantity % picsPerPart)
             totalParts = absolutePicsQuantity/picsPerPart + 1;
@@ -85,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
         endPicsDisplay = part * picsPerPart;
         startPicsDisplay = endPicsDisplay - picsPerPart;
+
         while(!in.atEnd())
         {
             QString line = in.readLine();
@@ -134,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lines = new QLineEdit(this);
     partEditLine = new QLineEdit(this);
     picsPerPartEditLine = new QLineEdit(this);
+
     resizeButton = new QPushButton("Resize",this);
     nextPage = new QPushButton("Next Page",this);
     previousPage = new QPushButton("Previous Page", this);
@@ -183,38 +189,39 @@ MainWindow::~MainWindow()
         delete picButton[i];
 
     }
+    delete acceptButton;
     delete resizeButton;
     delete changePart;
-    delete changePicsPerPart;
     delete partEditLine;
     delete picsPerPartEditLine;
+
     delete columns;
     delete lines;
     delete nextPage;
     delete previousPage;
+    delete changePicsPerPart;
     delete ui;
 }
-//*************************************************************************************************
+//***************************************************************
 void MainWindow::createButtons()
 {
-
-        if( absolutePicsQuantity < part * picsPerPart )
-        {
-            if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
-                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w) + 1;
-            else if((absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
-                size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w);
-            else
-                size = 1;
-
-        }
+    if( absolutePicsQuantity < part * picsPerPart )
+    {
+        if( (absolutePicsQuantity - (part-1) * picsPerPart) % (k*w) && (absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+            size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w) + 1;
+        else if((absolutePicsQuantity - (part-1) * picsPerPart) > (k*w))
+            size = (absolutePicsQuantity - (part-1) * picsPerPart)/(k*w);
         else
-        {
-            if(picsPerPart%(k*w))
-                size = picsPerPart/(k*w) + 1;
-            else
-                size = picsPerPart/(k*w);
-        }
+            size = 1;
+
+    }
+    else
+    {
+        if(picsPerPart%(k*w))
+            size = picsPerPart/(k*w) + 1;
+        else
+            size = picsPerPart/(k*w);
+    }
 
     if(page!=1)
         previousPage->setEnabled(true);
@@ -329,7 +336,7 @@ void MainWindow::makeGray(QPixmap pixmap, int a)
 }
 //******************************************************************
 void MainWindow::picButtons()
-{    
+{
         int a = sender()->objectName().toInt();
         QMessageBox msgBox;
         msgBox.setWindowTitle("Przeniesienie zdjęcia");
@@ -384,6 +391,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     QPainter painter(this);
     if(isStarted)
     {
+
         painter.setFont(QFont("Arial", 14));
         painter.drawText(x-216,46, "X");
         painter.setFont(QFont("Times", 10));
@@ -394,7 +402,6 @@ void MainWindow::paintEvent(QPaintEvent *)
         painter.drawText(335, 44, "Part: "+QString::number(part)+"/"+QString::number(totalParts));
         painter.drawText(50,32,"Pictures per part:");
         painter.drawText(75,48, QString::number(picsPerPart) + "/" + QString::number(absolutePicsQuantity));
-
     }
 }
 //*********************************************************************
@@ -458,15 +465,16 @@ void MainWindow::acceptAction()
 void MainWindow::restartAction()
 {
     MainWindow::appFirstStarted = false;
-    if((!partEditLine->text().isEmpty() || !picsPerPartEditLine->text().isEmpty()) && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
+
+    if(!partEditLine->text().isEmpty() && (unsigned)partEditLine->text().toInt()<=totalParts && (unsigned)partEditLine->text().toInt()>0)
     {
-        if((unsigned)partEditLine->text().toInt()!=part)
-        {
-            this->close();
-            qApp->exit(MainWindow::EXIT_CODE_REBOOT);
-            delete this;
-            part = partEditLine->text().toInt();
-        }
+        newPart = partEditLine->text().toInt();
+        this->close();
+        delete this;
+        MainWindow *wnd;
+        wnd = new MainWindow();
+        wnd->showMaximized();
+        //qApp->exit(MainWindow::EXIT_CODE_REBOOT);
     }
     else
        QMessageBox::information(this,
@@ -481,10 +489,12 @@ void MainWindow::changePicsPerPartAction()
    {
        MainWindow::appFirstStarted = false;
        this->close();
-       qApp->exit(MainWindow::EXIT_CODE_REBOOT);
        delete this;
-       part = 1;
+       newPart = 1;
        picsPerPart = picsPerPartEditLine->text().toInt();
+       MainWindow *wnd;
+       wnd = new MainWindow();
+       wnd->showMaximized();
    }
    else
       QMessageBox::information(this,
