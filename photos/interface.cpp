@@ -3,8 +3,8 @@
 /*Interface::Interface()
 {
 
-}
-*/
+}*/
+
 Interface::~Interface()
 {
 

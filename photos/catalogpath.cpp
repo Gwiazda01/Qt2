@@ -12,20 +12,38 @@ CatalogPath::~CatalogPath()
 //*********************************************************************************
 QString CatalogPath::getAbsFilePath(QString pathToFileWithPaths, unsigned int position)
 {
-    QFileInfoList info = QDir(pathToFileWithPaths).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
-                                                                            QDir::Files, QDir::Name);
-    int iterator = 0;
-    QString x;
-    foreach(const QFileInfo &inf, info)
+    QFile file(pathToFileWithPaths);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            qDebug()<<"ERROR!";
+    QTextStream in(&file);
+    in.setCodec("UTF-8");
+    QString line, x;
+
+    while(!in.atEnd())
     {
-        if( iterator == position )
+        line = in.readLine();
+
+        QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
+                                                                            QDir::Files, QDir::Name);
+        int iterator = 0;
+        bool found = false;
+        foreach(const QFileInfo &inf, info)
         {
-            x = inf.absoluteFilePath();
-            break;
+            if( iterator == position )
+            {
+                x = inf.absoluteFilePath();
+                found = true;
+                break;
+            }
+            ++iterator;
         }
-        ++iterator;
+        if(found)
+            break;
     }
-    return x;
+        return x;
+
+    file.close();
+
 }
 
 

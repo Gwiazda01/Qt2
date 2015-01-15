@@ -6,7 +6,7 @@
 class Interface
 {
 public:
-   // Interface();
+    //Interface();
     virtual ~Interface();
     virtual QString getAbsFilePath(QString pathToFileWithPaths, unsigned int position) = 0;
 };

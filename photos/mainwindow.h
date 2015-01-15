@@ -3,6 +3,7 @@
 
 #include "custombutton.h"
 #include "catalogpath.h"
+#include "picturepath.h"
 
 #include <vector>
 #include <stdio.h>

@@ -7,7 +7,7 @@ bool MainWindow::katalog;
 QString MainWindow::filePath;
 unsigned int MainWindow::absolutePicsQuantity = 0;
 unsigned int MainWindow::part, MainWindow::picsPerPart = 10, MainWindow::newPart = 0;
-unsigned int MainWindow::k = 5, MainWindow::w = 3, MainWindow::page;
+unsigned int MainWindow::k = 1, MainWindow::w = 1, MainWindow::page;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,20 +32,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
         fPath.exec();
         if (fPath.clickedButton() == catalogButton)
+        {
             katalog = true;
-        else if (fPath.clickedButton() == fileButton)
-            katalog = false;
-
-    //QFileDialog dialog(this, tr("Ścieżki"), QDir::homePath(), "Text files (*.txt);; Any file (*)");
-        if(katalog)
             filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do katalogów"),
                                                             QDir::homePath(),
                                                             tr("Text files (*.txt);;Any file (*)"));
-        //filePath = dialog.getOpenFileName();
-        else
+        }
+
+        else if (fPath.clickedButton() == fileButton)
+        {
+            katalog = false;
             filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do plików"),
                                                         QDir::homePath(),
                                                         tr("Text files (*.txt);;Any file (*)"));
+        }
+
+    //QFileDialog dialog(this, tr("Ścieżki"), QDir::homePath(), "Text files (*.txt);; Any file (*)");
+
         //filePath = dialog.getOpenFileName();
     }
         isStarted = true;
@@ -65,16 +68,16 @@ MainWindow::MainWindow(QWidget *parent) :
             qint64 posBefore = in.pos();
             while(!in.atEnd())
             {
+                QString line = in.readLine();
                 if(katalog)
                 {
-                    QString line = in.readLine();
                     QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
                                                                                         QDir::Files, QDir::Name);
-                    foreach(const QFileInfo &inf, info)
-                        ++absolutePicsQuantity;
+                    foreach(const QFileInfo &a, info)
+                        ++absolutePicsQuantity;     
                 }
                 else
-                        ++absolutePicsQuantity;
+                    ++absolutePicsQuantity;
             }
             in.seek(posBefore);
             part = 1;
@@ -89,43 +92,19 @@ MainWindow::MainWindow(QWidget *parent) :
         endPicsDisplay = part * picsPerPart;
         startPicsDisplay = endPicsDisplay - picsPerPart;
 
-        while(!in.atEnd())
-        {
-            QString line = in.readLine();
+        //while(!in.atEnd())
+        //{
+
             int iterator = 0;
             CatalogPath abcd;
-            polimorf = &abcd;
+            PicturePath xyz;
             if(katalog)
             {
-                /*QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
-                                                                                        QDir::Files, QDir::Name);
-                foreach(const QFileInfo &inf, info)
-                {
-                    ++picsQuantity;
-                    if( (picsQuantity - 1 >= startPicsDisplay) && ( picsQuantity-1 < endPicsDisplay) )
-                    {
-                        picButton.push_back(new CustomButton(inf.absoluteFilePath(), this));
-                        picButton[iterator]->fileName = inf.fileName();
-                        picButton[iterator]->setObjectName(QString::number(iterator));
-                        ++iterator;
-                    }
-
-                }*/
-                QFileInfo *f;
-                for(unsigned int i = startPicsDisplay; i < endPicsDisplay && i < absolutePicsQuantity; ++i)
-                {
-                    f = new QFileInfo(polimorf->getAbsFilePath(line, i));
-                    picButton.push_back(new CustomButton(f->absoluteFilePath(), this));
-                    picButton[iterator]->fileName = f->fileName();
-                    delete f;
-                    picButton[iterator]->setObjectName(QString::number(iterator));
-                    ++iterator;
-                }
-                //qDebug()<<"OK!";
+                polimorf = &abcd;
             }
             else
             {
-                    QFileInfo file(line);
+                    /*QFileInfo file(line);
                     ++picsQuantity;
                     if( (picsQuantity - 1 >= startPicsDisplay) && (picsQuantity - 1 < endPicsDisplay) )
                     {
@@ -133,11 +112,20 @@ MainWindow::MainWindow(QWidget *parent) :
                         picButton[iterator]->fileName = file.fileName();
                         picButton[iterator]->setObjectName(QString::number(iterator));
                         ++iterator;
-                    }
-
-
+                    }*/ 
+                polimorf = &xyz;
+              }
+            QFileInfo *f;
+            for(unsigned int i = startPicsDisplay; i < endPicsDisplay && i < absolutePicsQuantity; ++i)
+            {
+                f = new QFileInfo(polimorf->getAbsFilePath(filePath, i));
+                picButton.push_back(new CustomButton(f->absoluteFilePath(), this));
+                picButton[iterator]->fileName = f->fileName();
+                delete f;
+                picButton[iterator]->setObjectName(QString::number(iterator));
+                ++iterator;
             }
-        }
+        //}
         file.close();
     }
     else

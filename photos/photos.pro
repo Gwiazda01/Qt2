@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     custombutton.cpp \
     interface.cpp \
-    catalogpath.cpp
+    catalogpath.cpp \
+    picturepath.cpp
 
 HEADERS  += mainwindow.h \
     custombutton.h \
     interface.h \
-    catalogpath.h
+    catalogpath.h \
+    picturepath.h
 
 FORMS    += mainwindow.ui
 
