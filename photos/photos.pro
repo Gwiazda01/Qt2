@@ -14,10 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    custombutton.cpp
+    custombutton.cpp \
+    interface.cpp \
+    catalogpath.cpp
 
 HEADERS  += mainwindow.h \
-    custombutton.h
+    custombutton.h \
+    interface.h \
+    catalogpath.h
 
 FORMS    += mainwindow.ui
 

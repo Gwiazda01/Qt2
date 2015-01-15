@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "custombutton.h"
+#include "catalogpath.h"
+
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,16 +26,18 @@ public:
     static int const EXIT_CODE_REBOOT;
     static bool appFirstStarted, katalog;
     static QString filePath;
-    static unsigned int absolutePicsQuantity, part, totalParts, picsPerPart, newPart;
+    static unsigned int absolutePicsQuantity, part, picsPerPart, newPart, k ,w, page;
 protected:
     void paintEvent(QPaintEvent *);
     void createButtons(unsigned int, unsigned int);
     void makeGray(QPixmap, int );
+
+    Interface *polimorf;
     QString abc, root;
-    QPushButton *resizeButton, *nextPage, *previousPage, *okButton, *acceptButton, *changePart, *changePicsPerPart;
+    QPushButton *resizeButton, *nextPage, *previousPage/*, *okButton*/, *acceptButton, *changePage;
     std::vector <CustomButton*> picButton;
-    unsigned int x,y, picsQuantity, page, k, w, size, startPicsDisplay, endPicsDisplay;
-    QLineEdit *columns, *lines, *partEditLine, *picsPerPartEditLine;
+    unsigned int x,y, picsQuantity, size, startPicsDisplay, endPicsDisplay, lastPicsPerPart;
+    QLineEdit *columns, *lines, *pageEditLine;
     bool isStarted;
 
 
@@ -45,7 +49,8 @@ public slots:
     void resizeBtn();
     void acceptAction();
     void restartAction();
-    void changePicsPerPartAction();
+    void pageEditAction();
+    //void changePicsPerPartAction();
 
 private:
     Ui::MainWindow *ui;
