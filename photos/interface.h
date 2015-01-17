@@ -8,7 +8,8 @@ class Interface
 public:
     //Interface();
     virtual ~Interface();
-    virtual QString getAbsFilePath(QString pathToFileWithPaths, unsigned int position) = 0;
+    virtual QString getAbsFilePath(unsigned int position) = 0;
+    virtual unsigned int getAbsPicsQuantity() = 0;
 };
 
 #endif // INTERFACE_H

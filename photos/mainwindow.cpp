@@ -3,11 +3,11 @@
 
 int const MainWindow::EXIT_CODE_REBOOT = -123456789;
 bool MainWindow::appFirstStarted = true;
-bool MainWindow::katalog;
-QString MainWindow::filePath;
+bool MainWindow::catalog, MainWindow::picture;
+
 unsigned int MainWindow::absolutePicsQuantity = 0;
-unsigned int MainWindow::part, MainWindow::picsPerPart = 10, MainWindow::newPart = 0;
-unsigned int MainWindow::k = 1, MainWindow::w = 1, MainWindow::page;
+unsigned int MainWindow::part, MainWindow::picsPerPart, MainWindow::newPart = 0;
+unsigned int MainWindow::k = 5, MainWindow::w = 3, MainWindow::page;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,67 +21,45 @@ MainWindow::MainWindow(QWidget *parent) :
     QRect rec = QApplication::desktop()->screenGeometry();
     x = rec.width();
     y = rec.height();
+    CatalogPath abcd;
+    PicturePath xyz;
+
     if(appFirstStarted)
     {
         QMessageBox fPath;
-        fPath.setWindowTitle("Wybór ścieżki");
-        fPath.setText("Do czego ścieżki będziesz wpisywać?");
+        fPath.setWindowTitle("Wybór danych");
+        fPath.setText("Skąd pobrać zdjęcia?");
         fPath.setIcon(QMessageBox::Question);
-        QPushButton *catalogButton = fPath.addButton(tr("Katalogi"), QMessageBox::ActionRole);
-        QPushButton *fileButton = fPath.addButton(tr("Pliki"), QMessageBox::ActionRole);
+        QPushButton *catalogButton = fPath.addButton(tr("Katalog ze zdjęciami"), QMessageBox::ActionRole);
+        QPushButton *fileButton = fPath.addButton(tr("Scieżki do zdjęć"), QMessageBox::ActionRole);
 
         fPath.exec();
+        page = 1;
+        part = 1;
         if (fPath.clickedButton() == catalogButton)
         {
-            katalog = true;
-            filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do katalogów"),
-                                                            QDir::homePath(),
-                                                            tr("Text files (*.txt);;Any file (*)"));
+            abcd.filePath = getFileName();
+            catalog = true;
         }
 
         else if (fPath.clickedButton() == fileButton)
         {
-            katalog = false;
-            filePath = QFileDialog::getOpenFileName(this, tr("Ścieżki do plików"),
-                                                        QDir::homePath(),
-                                                        tr("Text files (*.txt);;Any file (*)"));
+            xyz.filePath = getFileName();
+            picture = true;
+
         }
 
-    //QFileDialog dialog(this, tr("Ścieżki"), QDir::homePath(), "Text files (*.txt);; Any file (*)");
-
-        //filePath = dialog.getOpenFileName();
     }
         isStarted = true;
-    if(!filePath.isEmpty())
-    {
-        QFile file(MainWindow::filePath);
-        if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                QMessageBox::information(this,
-                "File open error",
-                "Nie mozna otworzyc katalogu ze sciazkami do zdjec."
-                );
-        QTextStream in(&file);
-        in.setCodec("UTF-8");
-        if(appFirstStarted)
-        {
-            page = 1;
-            qint64 posBefore = in.pos();
-            while(!in.atEnd())
-            {
-                QString line = in.readLine();
-                if(katalog)
-                {
-                    QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
-                                                                                        QDir::Files, QDir::Name);
-                    foreach(const QFileInfo &a, info)
-                        ++absolutePicsQuantity;     
-                }
-                else
-                    ++absolutePicsQuantity;
-            }
-            in.seek(posBefore);
-            part = 1;
+        if(catalog)
+            polimorf = &abcd;
+        else if(picture)
+            polimorf = &xyz;
 
+        absolutePicsQuantity = polimorf->getAbsPicsQuantity();
+        if(!absolutePicsQuantity)
+        {
+            noPicturesError();
         }
 
         if(newPart>0)
@@ -92,47 +70,26 @@ MainWindow::MainWindow(QWidget *parent) :
         endPicsDisplay = part * picsPerPart;
         startPicsDisplay = endPicsDisplay - picsPerPart;
 
-        //while(!in.atEnd())
-        //{
 
-            int iterator = 0;
-            CatalogPath abcd;
-            PicturePath xyz;
-            if(katalog)
-            {
-                polimorf = &abcd;
-            }
+        int iterator = 0;
+        QFileInfo *f;
+        QString picturePath;
+        for(unsigned int i = startPicsDisplay; i < endPicsDisplay && i < absolutePicsQuantity; ++i)
+        {
+            picturePath = polimorf->getAbsFilePath(i);
+            if(picturePath == "ERROR")
+                openError();
             else
             {
-                    /*QFileInfo file(line);
-                    ++picsQuantity;
-                    if( (picsQuantity - 1 >= startPicsDisplay) && (picsQuantity - 1 < endPicsDisplay) )
-                    {
-                        picButton.push_back(new CustomButton(file.absoluteFilePath(), this));
-                        picButton[iterator]->fileName = file.fileName();
-                        picButton[iterator]->setObjectName(QString::number(iterator));
-                        ++iterator;
-                    }*/ 
-                polimorf = &xyz;
-              }
-            QFileInfo *f;
-            for(unsigned int i = startPicsDisplay; i < endPicsDisplay && i < absolutePicsQuantity; ++i)
-            {
-                f = new QFileInfo(polimorf->getAbsFilePath(filePath, i));
+                f = new QFileInfo(polimorf->getAbsFilePath(i));
                 picButton.push_back(new CustomButton(f->absoluteFilePath(), this));
                 picButton[iterator]->fileName = f->fileName();
                 delete f;
                 picButton[iterator]->setObjectName(QString::number(iterator));
                 ++iterator;
             }
-        //}
-        file.close();
-    }
-    else
-        QMessageBox::information(this,
-        "File path error",
-        "Błąd odczytu ścieżki pliku."
-        );
+        }
+
 
     columns = new QLineEdit(this);
     lines = new QLineEdit(this);
@@ -182,6 +139,7 @@ MainWindow::~MainWindow()
         delete picButton[i];
 
     }
+
     delete acceptButton;
     delete resizeButton;
 
@@ -194,6 +152,15 @@ MainWindow::~MainWindow()
 //***************************************************************
 void MainWindow::createButtons()
 {
+
+    if(!absolutePicsQuantity)
+    {
+        resizeButton->setEnabled(false);
+        acceptButton->setEnabled(false);
+        changePage->setEnabled(false);
+    }
+
+
     if(absolutePicsQuantity%(k*w))
         size = absolutePicsQuantity/(k*w) + 1;
     else
@@ -380,9 +347,8 @@ void MainWindow::paintEvent(QPaintEvent *)
         painter.drawText(x-315,28, "Columns:");
         painter.drawText(x-195,28, "Lines:");
         painter.setFont(QFont("Times", 11));
-        //painter.drawText(335,44,polimorf->getAbsFilePath("C:/Users/Marta/Desktop/Podlogi/samochod", 0));
         painter.drawText(50,32,"Page:");
-        painter.drawText(75,48, QString::number(page) + "/" + QString::number(size));
+        painter.drawText(70,48, QString::number(page) + "/" + QString::number(size));
     }
 }
 //*********************************************************************
@@ -488,4 +454,29 @@ void MainWindow::pageEditAction()
         }
     }
 
+}
+//*****************************************************************************************
+void MainWindow::openError()
+{
+        QMessageBox::information(this,
+        "File open error",
+        "Nie można otworzyć pliku ze ścieżkami do zdjęć."
+        );
+}
+//****************************************************************************************
+void MainWindow::noPicturesError()
+{
+        QMessageBox::information(this,
+        "Błąd",
+        "Brak zdjęć do wyświetlenia."
+        );
+}
+
+//****************************************************************************************
+QString MainWindow::getFileName()
+{
+    QString result = QFileDialog::getOpenFileName(this, tr("Ścieżka do zdjęć"),
+                                                                QDir::homePath(),
+                                                                tr("Text files (*.txt);;Any file (*)"));
+    return result;
 }

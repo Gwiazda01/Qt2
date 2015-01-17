@@ -25,22 +25,24 @@ public:
     ~MainWindow();
 
     static int const EXIT_CODE_REBOOT;
-    static bool appFirstStarted, katalog;
-    static QString filePath;
+    static bool appFirstStarted, catalog, picture;
     static unsigned int absolutePicsQuantity, part, picsPerPart, newPart, k ,w, page;
+
 protected:
     void paintEvent(QPaintEvent *);
     void createButtons(unsigned int, unsigned int);
     void makeGray(QPixmap, int );
+    QString getFileName();
+    void openError();
+    void noPicturesError();
 
     Interface *polimorf;
     QString abc, root;
-    QPushButton *resizeButton, *nextPage, *previousPage/*, *okButton*/, *acceptButton, *changePage;
+    QPushButton *resizeButton, *nextPage, *previousPage, *acceptButton, *changePage;
     std::vector <CustomButton*> picButton;
     unsigned int x,y, picsQuantity, size, startPicsDisplay, endPicsDisplay, lastPicsPerPart;
     QLineEdit *columns, *lines, *pageEditLine;
     bool isStarted;
-
 
 public slots:
     void picButtons();

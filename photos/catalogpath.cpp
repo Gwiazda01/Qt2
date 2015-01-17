@@ -1,5 +1,8 @@
 #include "catalogpath.h"
 
+QString CatalogPath::filePath;
+
+
 CatalogPath::CatalogPath()
 {
 
@@ -10,11 +13,11 @@ CatalogPath::~CatalogPath()
 
 }
 //*********************************************************************************
-QString CatalogPath::getAbsFilePath(QString pathToFileWithPaths, unsigned int position)
+QString CatalogPath::getAbsFilePath(unsigned int position)
 {
-    QFile file(pathToFileWithPaths);
+    QFile file(filePath);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            qDebug()<<"ERROR!";
+            return "ERROR";
     QTextStream in(&file);
     in.setCodec("UTF-8");
     QString line, x;
@@ -25,7 +28,7 @@ QString CatalogPath::getAbsFilePath(QString pathToFileWithPaths, unsigned int po
 
         QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
                                                                             QDir::Files, QDir::Name);
-        int iterator = 0;
+        unsigned int iterator = 0;
         bool found = false;
         foreach(const QFileInfo &inf, info)
         {
@@ -40,11 +43,32 @@ QString CatalogPath::getAbsFilePath(QString pathToFileWithPaths, unsigned int po
         if(found)
             break;
     }
-        return x;
-
     file.close();
+    return x;
 
 }
+//********************************************************************************
+unsigned int CatalogPath::getAbsPicsQuantity()
+{
+    unsigned int picsQuantity = 0;
+    if(!filePath.isEmpty())
+    {
+        QFile file(filePath);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                return 0;
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+            while(!in.atEnd())
+            {
+                QString line = in.readLine();
+                QFileInfoList info = QDir(line).entryInfoList(QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",
+                                                                                        QDir::Files, QDir::Name);
+                foreach(const QFileInfo &a, info)
+                    ++picsQuantity;
 
+            }
+    }
+    return picsQuantity;
+}
 
 
